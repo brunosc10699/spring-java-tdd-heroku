@@ -1,5 +1,6 @@
 package com.bruno.project.entities;
 
+import com.bruno.project.enums.BookGenre;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,4 +40,6 @@ public class Book implements Serializable {
     private String publisher;
 
     private String urlCover;
+
+    private BookGenre bookGenre;
 }
