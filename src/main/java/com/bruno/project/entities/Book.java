@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_book")
@@ -42,4 +44,11 @@ public class Book implements Serializable {
     private String urlCover;
 
     private BookGenre bookGenre;
+
+    @ManyToMany
+    @JoinTable(name = "tb_book_author",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "author_id")
+    )
+    private List<Author> authors = new ArrayList<>();
 }
