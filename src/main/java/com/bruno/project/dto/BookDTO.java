@@ -24,16 +24,16 @@ public class BookDTO implements Serializable {
 
     private Long id;
 
-    @ISBN(message = "What you typed doesn't look like an ISBN!")
+    @ISBN(message = "What you entered doesn't look like an ISBN!")
     private String isbn;
 
-    @NotEmpty(message = "You need to type your book title!")
+    @NotEmpty(message = "You need to enter the book's title!")
     private String title;
 
-    @NotEmpty(message = "How many pages does your book have?")
+    @NotEmpty(message = "How many pages does the book have?")
     private Integer printLength;
 
-    @NotEmpty(message = "What is the main language of your book?")
+    @NotEmpty(message = "What is the main language of the book?")
     private String language;
 
     @PastOrPresent(message = "The publication date must not be in the future!")
@@ -45,7 +45,7 @@ public class BookDTO implements Serializable {
 
     private BookGenre bookGenre;
 
-    @PastOrPresent(message = "The publication date must not be in the future!")
+    @NotEmpty(message = "You must enter at least one author name!")
     private List<Author> authors = new ArrayList<>();
 
     public BookDTO(Book book){
