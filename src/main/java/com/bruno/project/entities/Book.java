@@ -50,5 +50,6 @@ public class Book implements Serializable {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
+    @Column(nullable = false)
     private List<Author> authors = new ArrayList<>();
 }
