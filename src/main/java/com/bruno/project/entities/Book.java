@@ -37,7 +37,7 @@ public class Book implements Serializable {
     private String language;
 
     @Column(nullable = false)
-    private LocalDate publicationDate;
+    private String publicationYear;
 
     private String publisher;
 

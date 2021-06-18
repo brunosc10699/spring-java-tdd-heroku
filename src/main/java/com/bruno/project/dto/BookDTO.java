@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +35,8 @@ public class BookDTO implements Serializable {
     @NotEmpty(message = "What is the main language of the book?")
     private String language;
 
-    @PastOrPresent(message = "The publication date must not be in the future!")
-    private LocalDate publicationDate;
+    @Size(min = 4, max = 4, message = "The publication year is required and must have 4 characters!")
+    private String publicationYear;
 
     private String publisher;
 
@@ -54,7 +53,7 @@ public class BookDTO implements Serializable {
         title = book.getTitle();
         printLength = book.getPrintLength();
         language = book.getLanguage();
-        publicationDate = book.getPublicationDate();
+        publicationYear = book.getPublicationYear();
         publisher = book.getPublisher();
         urlCover = book.getUrlCover();
         bookGenre = book.getBookGenre();
