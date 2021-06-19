@@ -24,8 +24,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
 
-    private List<Book> books = new ArrayList<>();
-
     private Author author = new Author(
             1l,
             "Jo Nesbø",
@@ -34,7 +32,7 @@ public class BookServiceTest {
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
             null,
-            books
+            null
     );
 
     private List<Author> authors = new ArrayList<>();

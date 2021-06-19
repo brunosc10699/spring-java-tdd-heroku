@@ -38,5 +38,6 @@ public class Author implements Serializable {
 
     private String urlPicture;
 
+    @ManyToMany(mappedBy = "authors")
     private List<Book> books = new ArrayList<>();
 }
