@@ -1,1 +1,1 @@
-# A simple books management system
+# A Simple Book Management System
