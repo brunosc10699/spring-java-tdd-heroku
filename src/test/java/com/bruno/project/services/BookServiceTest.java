@@ -56,6 +56,8 @@ public class BookServiceTest {
 
     private BookDTO givenBook = new BookDTO(expectedBook);
 
+    Page<Book> page = new PageImpl<Book>(Collections.singletonList(expectedBook));
+
     @Mock
     private BookRepository bookRepository;
 
@@ -63,14 +65,13 @@ public class BookServiceTest {
     private BookService bookService;
 
     @Test
-    @DisplayName("Should demonstrate a Page of Books return")
-    void whenFindAllIsCalledThenReturnAListOfBooks() {
-        Page<Book> page = new PageImpl<Book>(Collections.singletonList(expectedBook));
+    @DisplayName("Should return a Page of Books")
+    void whenFindAllIsCalledThenReturnAPageOfBooks() {
         when(bookRepository.findAll(PageRequest.of(0, 1))).thenReturn(page);
         Page<BookDTO> pageDTO = bookService.findAll(PageRequest.of(0, 1));
-        assertThat(page.getTotalPages(), is(equalTo(1)));
-        assertThat(page.getSize(), is(equalTo(1)));
-        assertThat(page.getTotalElements(), is(equalTo(1L)));
-        assertThat(page.getContent().get(0), is(equalTo(expectedBook)));
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
     }
 }
