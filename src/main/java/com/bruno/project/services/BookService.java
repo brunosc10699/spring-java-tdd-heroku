@@ -42,11 +42,6 @@ public class BookService {
         return bookRepository.findByPublisherIgnoreCase(text, pageable).map(BookDTO::new);
     }
 
-    @Transactional(readOnly = true)
-    public Page<BookDTO> findByAuthorIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByAuthorIgnoreCase(text, pageable).map(BookDTO::new);
-    }
-
     public BookDTO save(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
         return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
