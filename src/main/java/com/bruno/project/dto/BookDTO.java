@@ -1,6 +1,5 @@
 package com.bruno.project.dto;
 
-import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -45,7 +45,7 @@ public class BookDTO implements Serializable {
     private BookGenre bookGenre;
 
     @NotEmpty(message = "You must enter at least one author name!")
-    private List<Author> authors = new ArrayList<>();
+    private List<AuthorDTO> authors = new ArrayList<>();
 
     public BookDTO(Book book){
         id = book.getId();
@@ -57,6 +57,6 @@ public class BookDTO implements Serializable {
         publisher = book.getPublisher();
         urlCover = book.getUrlCover();
         bookGenre = book.getBookGenre();
-        authors = book.getAuthors();
+        authors = book.getAuthors().stream().map(AuthorDTO::new).collect(Collectors.toList());
     }
 }

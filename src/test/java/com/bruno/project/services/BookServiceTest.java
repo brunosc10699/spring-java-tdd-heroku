@@ -5,11 +5,15 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import com.bruno.project.repositories.BookRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
@@ -59,10 +63,14 @@ public class BookServiceTest {
     private BookService bookService;
 
     @Test
+    @DisplayName("Should demonstrate a Page of Books return")
     void whenFindAllIsCalledThenReturnAListOfBooks() {
-        when(bookRepository.findAll()).thenReturn(Collections.singletonList(expectedBook));
-        List<BookDTO> list = bookService.findAll();
-        assertThat(list, is(not(empty())));
-        assertThat(list.get(0), is(equalTo(givenBook)));
+        Page<Book> page = new PageImpl<Book>(Collections.singletonList(expectedBook));
+        when(bookRepository.findAll(PageRequest.of(0, 1))).thenReturn(page);
+        Page<BookDTO> pageDTO = bookService.findAll(PageRequest.of(0, 1));
+        assertThat(page.getTotalPages(), is(equalTo(1)));
+        assertThat(page.getSize(), is(equalTo(1)));
+        assertThat(page.getTotalElements(), is(equalTo(1L)));
+        assertThat(page.getContent().get(0), is(equalTo(expectedBook)));
     }
 }

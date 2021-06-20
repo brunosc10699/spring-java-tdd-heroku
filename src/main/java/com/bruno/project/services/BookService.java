@@ -4,12 +4,9 @@ import com.bruno.project.dto.BookDTO;
 import com.bruno.project.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookService {
@@ -17,7 +14,8 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public List<BookDTO> findAll() {
-        return bookRepository.findAll().stream().map(BookDTO::new).collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<BookDTO> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable).map(BookDTO::new);
     }
 }

@@ -1,7 +1,6 @@
 package com.bruno.project.dto;
 
 import com.bruno.project.entities.Author;
-import com.bruno.project.entities.Book;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -39,7 +39,7 @@ public class AuthorDTO implements Serializable {
 
     private String urlPicture;
 
-    private List<Book> books = new ArrayList<>();
+    private List<BookDTO> books = new ArrayList<>();
 
     public AuthorDTO(Author author){
         id = author.getId();
@@ -49,6 +49,6 @@ public class AuthorDTO implements Serializable {
         phone = author.getPhone();
         biography = author.getBiography();
         urlPicture = author.getUrlPicture();
-        books = author.getBooks();
+        books = author.getBooks().stream().map(BookDTO::new).collect(Collectors.toList());
     }
 }
