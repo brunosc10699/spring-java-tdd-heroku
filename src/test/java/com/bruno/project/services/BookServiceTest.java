@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +56,11 @@ public class BookServiceTest {
 
     private BookDTO givenBook = new BookDTO(expectedBook);
 
-    Page<Book> page = new PageImpl<Book>(Collections.singletonList(expectedBook));
+    private Page<Book> page = new PageImpl<Book>(Collections.singletonList(expectedBook));
+
+    private Page<BookDTO> pageDTO;
+
+    private PageRequest pageRequest = PageRequest.of(0, 1);
 
     @Mock
     private BookRepository bookRepository;
@@ -67,11 +71,39 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should return a Page of Books")
     void whenFindAllIsCalledThenReturnAPageOfBooks() {
-        when(bookRepository.findAll(PageRequest.of(0, 1))).thenReturn(page);
-        Page<BookDTO> pageDTO = bookService.findAll(PageRequest.of(0, 1));
+        when(bookRepository.findAll(pageRequest)).thenReturn(page);
+        pageDTO = bookService.findAll(pageRequest);
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
         assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+    }
+
+    @Test
+    @DisplayName("Should return an empty Page of Books")
+    void whenFindAllIsCalledThenReturnAnEmptyPageOfBooks() {
+        when(bookRepository.findAll(pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findAll(pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+    @Test
+    @DisplayName("Should return a Page of Books searched by title")
+    void whenFindByTitleIgnoreCaseIsCalledThenReturnAPageOfBooks() {
+        when(bookRepository.findByTitleIgnoreCase("searchedTitle", pageRequest))
+                .thenReturn(page);
+        pageDTO = bookService.findByTitleIgnoreCase("searchedTitle", pageRequest);
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+    }
+
+    @Test
+    @DisplayName("Should return an empty Page of Books when a title is entered")
+    void whenFindByTitleIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
+        when(bookRepository.findByTitleIgnoreCase("searchedTitle", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByTitleIgnoreCase("searchedTitle", pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
     }
 }

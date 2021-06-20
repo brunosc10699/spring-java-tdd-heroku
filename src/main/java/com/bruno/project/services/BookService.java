@@ -18,4 +18,9 @@ public class BookService {
     public Page<BookDTO> findAll(Pageable pageable) {
         return bookRepository.findAll(pageable).map(BookDTO::new);
     }
+
+    public Page<BookDTO> findByTitleIgnoreCase(String text, Pageable pageable){
+        return bookRepository.findByTitleIgnoreCase(text, pageable).map(BookDTO::new);
+    }
+
 }
