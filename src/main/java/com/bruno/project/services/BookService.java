@@ -6,6 +6,7 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,15 @@ public class BookService {
     public BookDTO save(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
         return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
+    }
+
+    public BookDTO updateById(BookDTO bookDTO){
+        checkRegisteredISBN(bookDTO.getIsbn());
+        Book book = bookRepository.getById(bookDTO.getId());
+        if(book != null){
+            return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
+        }
+        throw new BookNotFoundException(bookDTO.getId());
     }
 
     private void checkRegisteredISBN(String isbn){
