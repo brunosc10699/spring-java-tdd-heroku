@@ -90,9 +90,9 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should return a Page of Books searched by title")
     void whenFindByTitleIgnoreCaseIsCalledThenReturnAPageOfBooks() {
-        when(bookRepository.findByTitleIgnoreCase("searchedTitle", pageRequest))
+        when(bookRepository.findByTitleIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
-        pageDTO = bookService.findByTitleIgnoreCase("searchedTitle", pageRequest);
+        pageDTO = bookService.findByTitleIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
@@ -100,10 +100,31 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty Page of Books when a title is entered")
+    @DisplayName("Should return an empty Page of Books when a language is entered")
     void whenFindByTitleIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
-        when(bookRepository.findByTitleIgnoreCase("searchedTitle", pageRequest)).thenReturn(Page.empty());
-        pageDTO = bookService.findByTitleIgnoreCase("searchedTitle", pageRequest);
+        when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+
+    @Test
+    @DisplayName("Should return a Page of Books searched by language")
+    void whenFindByLanguageIgnoreCaseIsCalledThenReturnAPageOfBooks() {
+        when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest))
+                .thenReturn(page);
+        pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+    }
+
+    @Test
+    @DisplayName("Should return an empty Page of Books when a language is entered")
+    void whenFindByLanguageIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
+        when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 }
