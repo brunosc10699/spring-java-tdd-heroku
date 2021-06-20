@@ -27,8 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
@@ -202,5 +201,22 @@ public class BookServiceTest {
     void whenAnUnregisteredIdIsGivenToUpdateDataBookThenThrowAnException() {
         when(bookRepository.getById(expectedBook.getId())).thenReturn(null);
         assertThrows(BookNotFoundException.class, () -> bookService.updateById(givenBook));
+    }
+
+    @Test
+    @DisplayName("Should delete a book when a registered id is supplied")
+    void whenARegisteredBookIdIsGivenThenABookShouldBeDeleted() {
+        when(bookRepository.getById(expectedBook.getId())).thenReturn(expectedBook);
+        doNothing().when(bookRepository).deleteById(expectedBook.getId());
+        bookService.deleteById(givenBook.getId());
+        verify(bookRepository, times(1)).getById(expectedBook.getId());
+        verify(bookRepository, times(1)).deleteById(expectedBook.getId());
+    }
+
+    @Test
+    @DisplayName("Should throw a BookNotFoundException exception when an unregistered id is supplied")
+    void whenAnUnregisteredBookIdIsGivenThenThrowAnException() {
+        when(bookRepository.getById(expectedBook.getId())).thenReturn(null);
+        assertThrows(BookNotFoundException.class, () -> bookService.deleteById(givenBook.getId()));
     }
 }

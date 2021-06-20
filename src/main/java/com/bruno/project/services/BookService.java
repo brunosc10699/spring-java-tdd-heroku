@@ -57,6 +57,15 @@ public class BookService {
         throw new BookNotFoundException(bookDTO.getId());
     }
 
+    public void deleteById(Long id){
+        Book book = bookRepository.getById(id);
+        if(book != null){
+            bookRepository.deleteById(id);
+        } else {
+            throw new BookNotFoundException(id);
+        }
+    }
+
     private void checkRegisteredISBN(String isbn){
         Optional<Book> book = bookRepository.findByIsbn(isbn);
         if(book.isPresent()){
