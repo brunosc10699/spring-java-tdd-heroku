@@ -146,4 +146,25 @@ public class BookServiceTest {
         pageDTO = bookService.findByPublisherIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
+
+    @Test
+    @DisplayName("Should return a Page of Books searched by author")
+    void whenFindByAuthorIgnoreCaseIsCalledThenReturnAPageOfBooks() {
+        when(bookRepository.findByAuthorIgnoreCase("searchedText", pageRequest))
+                .thenReturn(page);
+        pageDTO = bookService.findByAuthorIgnoreCase("searchedText", pageRequest);
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+        assertThat(pageDTO.getContent().get(0).getAuthors(), is(equalTo(givenBook.getAuthors())));
+    }
+
+    @Test
+    @DisplayName("Should return an empty Page of Books when an author is entered")
+    void whenFindByAuthorIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
+        when(bookRepository.findByAuthorIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByAuthorIgnoreCase("searchedText", pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
+    }
 }
