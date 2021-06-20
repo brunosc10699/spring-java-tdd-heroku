@@ -5,6 +5,7 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import com.bruno.project.repositories.BookRepository;
+import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +20,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -166,5 +169,30 @@ public class BookServiceTest {
         when(bookRepository.findByAuthorIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findByAuthorIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+    @Test
+    @DisplayName("Should save a new Book")
+    void whenANewBookIsGivenThenItShouldBeSaved() {
+        when(bookRepository.findByIsbn(expectedBook.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.save(expectedBook)).thenReturn(expectedBook);
+        BookDTO bookDTO = bookService.save(givenBook);
+        assertThat(bookDTO.getId(), is(equalTo(givenBook.getId())));
+        assertThat(bookDTO.getIsbn(), is(equalTo(givenBook.getIsbn())));
+        assertThat(bookDTO.getTitle(), is(equalTo(givenBook.getTitle())));
+        assertThat(bookDTO.getPrintLength(), is(equalTo(givenBook.getPrintLength())));
+        assertThat(bookDTO.getLanguage(), is(equalTo(givenBook.getLanguage())));
+        assertThat(bookDTO.getPublicationYear(), is(equalTo(givenBook.getPublicationYear())));
+        assertThat(bookDTO.getPublisher(), is(equalTo(givenBook.getPublisher())));
+        assertThat(bookDTO.getUrlCover(), is(equalTo(givenBook.getUrlCover())));
+        assertThat(bookDTO.getBookGenre(), is(equalTo(givenBook.getBookGenre())));
+        assertThat(bookDTO.getAuthors(), is(equalTo(givenBook.getAuthors())));
+    }
+
+    @Test
+    @DisplayName("Should throw a BookAlreadyRegisteredException exception")
+    void whenISBNAlreadyRegisteredIsGivenToSaveANewBookThenThrowAnException() {
+        when(bookRepository.findByIsbn(expectedBook.getIsbn())).thenReturn(Optional.of(expectedBook));
+        assertThrows(BookAlreadyRegisteredException.class, () -> bookService.save(givenBook));
     }
 }

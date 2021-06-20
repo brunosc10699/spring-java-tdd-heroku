@@ -1,5 +1,7 @@
 package com.bruno.project.entities;
 
+import com.bruno.project.dto.AuthorDTO;
+import com.bruno.project.dto.BookDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +10,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_author")
@@ -40,4 +44,15 @@ public class Author implements Serializable {
 
     @ManyToMany(mappedBy = "authors")
     private List<Book> books = new ArrayList<>();
+
+    public Author(AuthorDTO authorDTO) {
+        id = authorDTO.getId();
+        name = authorDTO.getName();
+        birthDate = authorDTO.getBirthDate();
+        email = authorDTO.getEmail();
+        phone = authorDTO.getPhone();
+        biography = authorDTO.getBiography();
+        urlPicture = authorDTO.getUrlPicture();
+        books = authorDTO.getBooks().stream().map(Book::new).collect(Collectors.toList());
+    }
 }

@@ -1,5 +1,6 @@
 package com.bruno.project.entities;
 
+import com.bruno.project.dto.BookDTO;
 import com.bruno.project.enums.BookGenre;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_book")
@@ -52,4 +54,17 @@ public class Book implements Serializable {
     )
     @Column(nullable = false)
     private List<Author> authors = new ArrayList<>();
+
+    public Book(BookDTO bookDTO) {
+        id = bookDTO.getId();
+        isbn = bookDTO.getIsbn();
+        title = bookDTO.getTitle();
+        printLength = bookDTO.getPrintLength();
+        language = bookDTO.getLanguage();
+        publicationYear = bookDTO.getPublicationYear();
+        publisher = bookDTO.getPublisher();
+        urlCover = bookDTO.getUrlCover();
+        bookGenre = bookDTO.getBookGenre();
+        authors = bookDTO.getAuthors().stream().map(Author::new).collect(Collectors.toList());
+    }
 }
