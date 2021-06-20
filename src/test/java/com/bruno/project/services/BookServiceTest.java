@@ -107,7 +107,6 @@ public class BookServiceTest {
         assertThat(pageDTO.getContent(), is(empty()));
     }
 
-
     @Test
     @DisplayName("Should return a Page of Books searched by language")
     void whenFindByLanguageIgnoreCaseIsCalledThenReturnAPageOfBooks() {
@@ -125,6 +124,26 @@ public class BookServiceTest {
     void whenFindByLanguageIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
         when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+    @Test
+    @DisplayName("Should return a Page of Books searched by publisher")
+    void whenFindByPublisherIgnoreCaseIsCalledThenReturnAPageOfBooks() {
+        when(bookRepository.findByPublisherIgnoreCase("searchedText", pageRequest))
+                .thenReturn(page);
+        pageDTO = bookService.findByPublisherIgnoreCase("searchedText", pageRequest);
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+    }
+
+    @Test
+    @DisplayName("Should return an empty Page of Books when a publisher is entered")
+    void whenFindByPublisherIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
+        when(bookRepository.findByPublisherIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByPublisherIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 }

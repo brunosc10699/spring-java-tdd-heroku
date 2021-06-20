@@ -29,4 +29,9 @@ public class BookService {
         return bookRepository.findByLanguageIgnoreCase(text, pageable).map(BookDTO::new);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BookDTO> findByPublisherIgnoreCase(String text, Pageable pageable){
+        return bookRepository.findByPublisherIgnoreCase(text, pageable).map(BookDTO::new);
+    }
+
 }
