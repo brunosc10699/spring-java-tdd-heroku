@@ -90,4 +90,13 @@ public class BookResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Should return 200 Ok status")
+    void whenGETIsCalledToFindBooksByTitleThenReturnOkStatus() throws Exception {
+        when(bookService.findByTitleIgnoreCase(givenBook.getTitle(), pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/title?text=" + givenBook.getTitle())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
