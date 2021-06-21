@@ -4,6 +4,7 @@ import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.AuthorRepository;
+import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +19,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +45,7 @@ public class AuthorServiceTest {
 
     private AuthorDTO givenAuthor = new AuthorDTO(expectedAuthor);
 
+    private AuthorDTO authorDTO;
 
     private Page<Author> page = new PageImpl<Author>(Collections.singletonList(expectedAuthor));
 
@@ -93,5 +97,29 @@ public class AuthorServiceTest {
         when(authorRepository.findByNameIgnoreCase("name", pageRequest)).thenReturn(Page.empty());
         pageDTO = authorService.findByNameIgnoreCase("name", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+    @Test
+    @DisplayName("Should create a new author")
+    void whenSaveMethodIsCalledThenShouldCreateANewAuthor() {
+        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.empty());
+        when(authorRepository.save(expectedAuthor)).thenReturn(expectedAuthor);
+        authorDTO = authorService.save(givenAuthor);
+        assertThat(authorDTO.getId(), is(equalTo(expectedAuthor.getId())));
+        assertThat(authorDTO.getName(), is(equalTo(expectedAuthor.getName())));
+        assertThat(authorDTO.getBirthDate(), is(equalTo(expectedAuthor.getBirthDate())));
+        assertThat(authorDTO.getEmail(), is(equalTo(expectedAuthor.getEmail())));
+        assertThat(authorDTO.getPhone(), is(equalTo(expectedAuthor.getPhone())));
+        assertThat(authorDTO.getBiography(), is(equalTo(expectedAuthor.getBiography())));
+        assertThat(authorDTO.getUrlPicture(), is(equalTo(expectedAuthor.getUrlPicture())));
+        assertThat(authorDTO.getBooks(), is(equalTo(expectedAuthor.getBooks())));
+    }
+
+    @Test
+    @DisplayName("Should throw a AuthorEmailAlreadyRegisteredException exception " +
+            "when trying to create an author with a registered email")
+    void whenSaveMethodIsCalledWithARegisteredEmailThenThrowException() {
+        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
+        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.save(givenAuthor));
     }
 }
