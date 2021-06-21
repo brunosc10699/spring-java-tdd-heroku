@@ -5,6 +5,7 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.resource.AuthorResource;
 import com.bruno.project.services.AuthorService;
+import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bruno.project.utils.JsonConversionUtil.asJsonString;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,9 +88,34 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("Must return 200 Ok status when searching for authors by name")
     void whenGETIsCalledToFindAuthorsByNameThenReturnOkStatus() throws Exception {
-        when(authorService.findByNameIgnoreCase(expectedAuthor.getName(), pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/name?text=" + expectedAuthor.getName())
+        when(authorService.findByNameIgnoreCase(givenAuthor.getName(), pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/name?text=" + givenAuthor.getName())
         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Must return 201 Created status")
+    void whenPOSTIsCalledThenReturnOkStatus() throws Exception {
+        when(authorService.save(givenAuthor)).thenReturn(givenAuthor);
+        mockMvc.perform(post(URL)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(givenAuthor)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(givenAuthor.getName())))
+                .andExpect(jsonPath("$.email", is(givenAuthor.getEmail())))
+                .andExpect(jsonPath("$.phone", is(givenAuthor.getPhone())))
+                .andExpect(jsonPath("$.biography", is(givenAuthor.getBiography())))
+                .andExpect(jsonPath("$.urlPicture", is(givenAuthor.getUrlPicture())));
+    }
+
+    @Test
+    @DisplayName("Must throw an AuthorEmailAlreadyRegisteredException exception when a registered email is provided")
+    void whenPOSTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
+        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).save(givenAuthor);
+        mockMvc.perform(post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(givenAuthor)))
+                .andExpect(status().isBadRequest());
     }
 }
