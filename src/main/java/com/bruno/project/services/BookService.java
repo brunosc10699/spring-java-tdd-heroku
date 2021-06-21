@@ -45,24 +45,27 @@ public class BookService {
 
     public BookDTO save(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
-//        return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
         return new BookDTO(bookRepository.save(new Book(bookDTO)));
     }
 
     public BookDTO updateById(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
-        Book book = bookRepository.getById(bookDTO.getId());
-        if(book != null){
-            return new BookDTO(bookRepository.save(new Book(bookDTO)));
-        }
-        throw new BookNotFoundException(bookDTO.getId());
+        checkRegisteredId(bookDTO.getId());
+        return new BookDTO(bookRepository.save(new Book(bookDTO)));
     }
 
     public void deleteById(Long id){
-        Book book = bookRepository.getById(id);
-        if(book != null){
+        if(checkRegisteredId(id)){
             bookRepository.deleteById(id);
-        } else throw new BookNotFoundException(id);
+        }// else throw new BookNotFoundException(id);
+    }
+
+    private Boolean checkRegisteredId(Long id){
+        Book book = bookRepository.getById(id);
+        if(book == null){
+            throw new BookNotFoundException(id);
+        }
+        return true;
     }
 
     private void checkRegisteredISBN(String isbn){

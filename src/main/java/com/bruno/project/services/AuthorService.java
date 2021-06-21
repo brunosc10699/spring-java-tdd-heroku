@@ -2,8 +2,11 @@ package com.bruno.project.services;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
+import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.AuthorNotFoundException;
+import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +37,23 @@ public class AuthorService {
         return new AuthorDTO(authorRepository.save(new Author(authorDTO)));
     }
 
+    public AuthorDTO updateById(AuthorDTO authorDTO) {
+        checkRegisteredEmail(authorDTO.getEmail());
+        checkRegisteredId(authorDTO.getId());
+        return new AuthorDTO(authorRepository.save(new Author(authorDTO)));
+    }
+
+    private Boolean checkRegisteredId(Long id){
+        Author author = authorRepository.getById(id);
+        if(author == null){
+            throw new AuthorNotFoundException(id);
+        }
+        return true;
+    }
+
     private void checkRegisteredEmail(String email){
         Optional<Author> author = authorRepository.findByEmailIgnoreCase(email);
         if(author.isPresent()) throw new AuthorEmailAlreadyRegisteredException(email);
     }
+
 }

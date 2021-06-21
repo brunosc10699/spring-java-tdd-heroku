@@ -122,4 +122,29 @@ public class AuthorServiceTest {
         when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
         assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.save(givenAuthor));
     }
+
+    @Test
+    @DisplayName("Should update author data by its id")
+    void whenUpdateByIdMethodIsCalledThenReturnAnUpdatedAuthor() {
+        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.empty());
+        when(authorRepository.getById(expectedAuthor.getId())).thenReturn(expectedAuthor);
+        when(authorRepository.save(expectedAuthor)).thenReturn(expectedAuthor);
+        authorDTO = authorService.updateById(givenAuthor);
+        assertThat(authorDTO.getId(), is(equalTo(expectedAuthor.getId())));
+        assertThat(authorDTO.getName(), is(equalTo(expectedAuthor.getName())));
+        assertThat(authorDTO.getBirthDate(), is(equalTo(expectedAuthor.getBirthDate())));
+        assertThat(authorDTO.getEmail(), is(equalTo(expectedAuthor.getEmail())));
+        assertThat(authorDTO.getPhone(), is(equalTo(expectedAuthor.getPhone())));
+        assertThat(authorDTO.getBiography(), is(equalTo(expectedAuthor.getBiography())));
+        assertThat(authorDTO.getUrlPicture(), is(equalTo(expectedAuthor.getUrlPicture())));
+        assertThat(authorDTO.getBooks(), is(equalTo(expectedAuthor.getBooks())));
+    }
+
+    @Test
+    @DisplayName("Should throw a AuthorEmailAlreadyRegisteredException exception " +
+            "when trying to update an author with a new already registered email")
+    void whenUpdateByIdMethodIsCalledWithANewRegisteredEmailThenThrowException() {
+        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
+        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.updateById(givenAuthor));
+    }
 }
