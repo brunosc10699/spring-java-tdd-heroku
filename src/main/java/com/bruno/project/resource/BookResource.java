@@ -29,4 +29,11 @@ public class BookResource {
     ){
         return ResponseEntity.ok(bookService.findByTitleIgnoreCase(title, pageable));
     }
+
+    @GetMapping(value = "/language")
+    public ResponseEntity<Page<BookDTO>> findByLanguageIgnoreCase(
+            @RequestParam(value = "text", defaultValue = "") String language, Pageable pageable
+    ){
+        return ResponseEntity.ok(bookService.findByLanguageIgnoreCase(language, pageable));
+    }
 }

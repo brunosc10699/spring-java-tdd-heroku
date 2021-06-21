@@ -83,7 +83,7 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status")
+    @DisplayName("Should return 200 Ok status when searching all books")
     void whenGETIsCalledToFindAllBooksThenReturnOkStatus() throws Exception {
         when(bookService.findAll(pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URL)
@@ -92,10 +92,19 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status")
+    @DisplayName("Should return 200 Ok status when searching by title")
     void whenGETIsCalledToFindBooksByTitleThenReturnOkStatus() throws Exception {
         when(bookService.findByTitleIgnoreCase(givenBook.getTitle(), pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/title?text=" + givenBook.getTitle())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Should return 200 Ok status when searching by language")
+    void whenGETIsCalledToFindBooksByLanguageThenReturnOkStatus() throws Exception {
+        when(bookService.findByLanguageIgnoreCase(givenBook.getLanguage(), pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/language?text=" + givenBook.getLanguage())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
