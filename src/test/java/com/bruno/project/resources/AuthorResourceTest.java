@@ -78,4 +78,13 @@ public class AuthorResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Must return 200 Ok status when searching for authors by name")
+    void whenGETIsCalledToFindAuthorsByNameThenReturnOkStatus() throws Exception {
+        when(authorService.findByNameIgnoreCase(expectedAuthor.getName(), pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/name?text=" + expectedAuthor.getName())
+        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }

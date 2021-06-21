@@ -7,7 +7,6 @@ import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredExcepti
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +25,8 @@ public class AuthorService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AuthorDTO> findByNameIgnoreCase(String name, PageRequest pageRequest) {
-        return authorRepository.findByNameIgnoreCase(name, pageRequest).map(AuthorDTO::new);
+    public Page<AuthorDTO> findByNameIgnoreCase(String name, Pageable pageable) {
+        return authorRepository.findByNameIgnoreCase(name, pageable).map(AuthorDTO::new);
     }
 
     public AuthorDTO save(AuthorDTO authorDTO) {
