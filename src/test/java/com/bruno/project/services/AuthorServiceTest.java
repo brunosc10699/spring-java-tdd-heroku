@@ -20,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +60,7 @@ public class AuthorServiceTest {
     void whenFindAllIsCalledThenReturnAPageWithAllAuthors() {
         when(authorRepository.findAll(pageRequest)).thenReturn(page);
         pageDTO = authorService.findAll(pageRequest);
+        assertThat(pageDTO.getContent(), is(not(empty())));
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
@@ -72,6 +72,26 @@ public class AuthorServiceTest {
     void whenFindAllIsCalledThenReturnAnEmptyPage() {
         when(authorRepository.findAll(pageRequest)).thenReturn(Page.empty());
         pageDTO = authorService.findAll(pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+    @Test
+    @DisplayName("Should return a page of authors searched by name")
+    void whenFindByNameIgnoreCaseIsCalledThenReturnAPageOfAuthors() {
+        when(authorRepository.findByNameIgnoreCase("name", pageRequest)).thenReturn(page);
+        pageDTO = authorService.findByNameIgnoreCase("name", pageRequest);
+        assertThat(pageDTO.getContent(), is(not(empty())));
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(givenAuthor)));
+    }
+
+    @Test
+    @DisplayName("Should return an empty page of authors")
+    void whenFindByNameIgnoreCaseIsCalledThenReturnAnEmptyPage() {
+        when(authorRepository.findByNameIgnoreCase("name", pageRequest)).thenReturn(Page.empty());
+        pageDTO = authorService.findByNameIgnoreCase("name", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 }
