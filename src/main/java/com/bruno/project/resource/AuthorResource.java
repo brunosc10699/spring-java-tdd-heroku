@@ -39,4 +39,9 @@ public class AuthorResource {
                 .toUri();
         return ResponseEntity.created(uri).body(authorDTO);
     }
+
+    @PutMapping
+    public ResponseEntity<AuthorDTO> updateById(@RequestBody AuthorDTO authorDTO){
+        return ResponseEntity.ok(authorService.updateById(authorDTO));
+    }
 }

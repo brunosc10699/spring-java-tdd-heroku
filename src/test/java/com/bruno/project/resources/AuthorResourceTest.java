@@ -118,4 +118,29 @@ public class AuthorResourceTest {
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("Must return 200 Ok status when updating author data")
+    void whenPUTIsCalledThenReturnOkStatus() throws Exception {
+        when(authorService.updateById(givenAuthor)).thenReturn(givenAuthor);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(givenAuthor)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(givenAuthor.getName())))
+                .andExpect(jsonPath("$.email", is(givenAuthor.getEmail())))
+                .andExpect(jsonPath("$.phone", is(givenAuthor.getPhone())))
+                .andExpect(jsonPath("$.biography", is(givenAuthor.getBiography())))
+                .andExpect(jsonPath("$.urlPicture", is(givenAuthor.getUrlPicture())));
+    }
+
+    @Test
+    @DisplayName("Must throw 400 BadRequest status when trying to update author data with an already registered email")
+    void whenPUTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
+        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).updateById(givenAuthor);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(givenAuthor)))
+                .andExpect(status().isBadRequest());
+    }
 }
