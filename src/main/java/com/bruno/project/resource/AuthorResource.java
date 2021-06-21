@@ -44,4 +44,10 @@ public class AuthorResource {
     public ResponseEntity<AuthorDTO> updateById(@RequestBody AuthorDTO authorDTO){
         return ResponseEntity.ok(authorService.updateById(authorDTO));
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+        authorService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

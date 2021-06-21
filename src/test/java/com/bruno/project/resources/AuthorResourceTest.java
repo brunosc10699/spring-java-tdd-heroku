@@ -6,6 +6,7 @@ import com.bruno.project.entities.Book;
 import com.bruno.project.resource.AuthorResource;
 import com.bruno.project.services.AuthorService;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,8 +29,7 @@ import java.util.List;
 
 import static com.bruno.project.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -110,7 +110,7 @@ public class AuthorResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw an AuthorEmailAlreadyRegisteredException exception when a registered email is provided")
+    @DisplayName("Must throw 400 BadRequest status when a registered email is provided")
     void whenPOSTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
         doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).save(givenAuthor);
         mockMvc.perform(post(URL)
@@ -142,5 +142,23 @@ public class AuthorResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Must return 204 NoContent status when trying to delete an author")
+    void whenDELETEIsCalledThenReturnNoContentStatus() throws Exception {
+        doNothing().when(authorService).deleteById(givenAuthor.getId());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + givenAuthor.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Must return 404 NotFound status when author id is not registered")
+    void whenDELETEIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(AuthorNotFoundException.class).when(authorService).deleteById(givenAuthor.getId());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + givenAuthor.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
