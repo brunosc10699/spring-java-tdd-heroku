@@ -7,6 +7,7 @@ import com.bruno.project.enums.BookGenre;
 import com.bruno.project.resource.BookResource;
 import com.bruno.project.services.BookService;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -149,6 +150,45 @@ public class BookResourceTest {
     void whenPOSTIsCalledWithARegisteredISBNThenThrowException() throws Exception {
         when(bookService.save(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
         mockMvc.perform(post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(expectedBook)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Must return 200 Ok status when updating book data")
+    void whenPUTIsCalledToUpdateBookDataThenReturnOkStatus() throws Exception {
+        when(bookService.updateById(expectedBook)).thenReturn(expectedBook);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(expectedBook)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is(expectedBook.getTitle())))
+                .andExpect(jsonPath("$.isbn", is(expectedBook.getIsbn())))
+                .andExpect(jsonPath("$.printLength", is(expectedBook.getPrintLength())))
+                .andExpect(jsonPath("$.language", is(expectedBook.getLanguage())))
+                .andExpect(jsonPath("$.publicationYear", is(expectedBook.getPublicationYear())))
+                .andExpect(jsonPath("$.publisher", is(expectedBook.getPublisher())))
+                .andExpect(jsonPath("$.urlCover", is(expectedBook.getUrlCover())))
+                .andExpect(jsonPath("$.bookGenre", is(expectedBook.getBookGenre().toString())));
+    }
+
+    @Test
+    @DisplayName("Must throw a BookNotFoundException exception when trying to update a book with an unregistered id")
+    void whenPUTIsCalledWithAnUnregisteredIdThenThrowException() throws Exception {
+        when(bookService.updateById(expectedBook)).thenThrow(BookNotFoundException.class);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(expectedBook)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Must throw a BookAlreadyRegisteredException exception " +
+            "when trying to update a book with a registered ISBN")
+    void whenPUTIsCalledWithARegisteredISBNThenThrowException() throws Exception {
+        when(bookService.updateById(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isBadRequest());

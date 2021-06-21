@@ -55,4 +55,9 @@ public class BookResource {
                 .toUri();
         return ResponseEntity.created(uri).body(bookDTO);
     }
+
+    @PutMapping
+    public ResponseEntity<BookDTO> updateById(@Valid @RequestBody BookDTO bookDTO){
+        return ResponseEntity.ok(bookService.updateById(bookDTO));
+    }
 }
