@@ -31,7 +31,7 @@ import java.util.List;
 
 import static com.bruno.project.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -147,7 +147,7 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Must throw a BookAlreadyRegisteredException exception when a registered ISBN is provided")
-    void whenPOSTIsCalledWithARegisteredISBNThenThrowException() throws Exception {
+    void whenPOSTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         when(bookService.save(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
         mockMvc.perform(post(URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -175,7 +175,7 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Must throw a BookNotFoundException exception when trying to update a book with an unregistered id")
-    void whenPUTIsCalledWithAnUnregisteredIdThenThrowException() throws Exception {
+    void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         when(bookService.updateById(expectedBook)).thenThrow(BookNotFoundException.class);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -186,11 +186,29 @@ public class BookResourceTest {
     @Test
     @DisplayName("Must throw a BookAlreadyRegisteredException exception " +
             "when trying to update a book with a registered ISBN")
-    void whenPUTIsCalledWithARegisteredISBNThenThrowException() throws Exception {
+    void whenPUTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         when(bookService.updateById(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Must return 204 NoContent status when deleting a book")
+    void whenDELETEIsCalledThenReturnNoContentStatus() throws Exception {
+        doNothing().when(bookService).deleteById(expectedBook.getId());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + expectedBook.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Must throw a BookNotFoundException exception when an unregistered id is provided")
+    void whenDELETEIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(BookNotFoundException.class).when(bookService).deleteById(expectedBook.getId());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + expectedBook.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

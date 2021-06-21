@@ -60,4 +60,10 @@ public class BookResource {
     public ResponseEntity<BookDTO> updateById(@Valid @RequestBody BookDTO bookDTO){
         return ResponseEntity.ok(bookService.updateById(bookDTO));
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+        bookService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
