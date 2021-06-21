@@ -145,6 +145,16 @@ public class AuthorResourceTest {
     }
 
     @Test
+    @DisplayName("Must throw 404 NotFound status when trying to update author data with an unregistered id")
+    void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(AuthorNotFoundException.class).when(authorService).updateById(givenAuthor);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(givenAuthor)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("Must return 204 NoContent status when trying to delete an author")
     void whenDELETEIsCalledThenReturnNoContentStatus() throws Exception {
         doNothing().when(authorService).deleteById(givenAuthor.getId());
