@@ -45,14 +45,15 @@ public class BookService {
 
     public BookDTO save(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
-        return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
+//        return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
+        return new BookDTO(bookRepository.save(new Book(bookDTO)));
     }
 
     public BookDTO updateById(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
         Book book = bookRepository.getById(bookDTO.getId());
         if(book != null){
-            return new BookDTO(bookRepository.save(fromDTO(bookDTO)));
+            return new BookDTO(bookRepository.save(new Book(bookDTO)));
         }
         throw new BookNotFoundException(bookDTO.getId());
     }
@@ -61,9 +62,7 @@ public class BookService {
         Book book = bookRepository.getById(id);
         if(book != null){
             bookRepository.deleteById(id);
-        } else {
-            throw new BookNotFoundException(id);
-        }
+        } else throw new BookNotFoundException(id);
     }
 
     private void checkRegisteredISBN(String isbn){
@@ -71,20 +70,5 @@ public class BookService {
         if(book.isPresent()){
             throw new BookAlreadyRegisteredException(isbn);
         }
-    }
-
-    private Book fromDTO(BookDTO bookDTO){
-        return new Book(
-                bookDTO.getId(),
-                bookDTO.getIsbn(),
-                bookDTO.getTitle(),
-                bookDTO.getPrintLength(),
-                bookDTO.getLanguage(),
-                bookDTO.getPublicationYear(),
-                bookDTO.getPublisher(),
-                bookDTO.getUrlCover(),
-                bookDTO.getBookGenre(),
-                bookDTO.getAuthors().stream().map(Author::new).collect(Collectors.toList())
-        );
     }
 }
