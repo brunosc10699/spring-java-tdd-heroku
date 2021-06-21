@@ -6,22 +6,27 @@ import com.bruno.project.entities.Book;
 import com.bruno.project.resource.AuthorResource;
 import com.bruno.project.services.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorResourceTest {
@@ -43,11 +48,11 @@ public class AuthorResourceTest {
 
     private AuthorDTO authorDTO;
 
-    private Page<Author> page = new PageImpl<Author>(Collections.singletonList(expectedAuthor));
-
-    private Page<AuthorDTO> pageDTO;
+    private Page<AuthorDTO> page;
 
     private PageRequest pageRequest = PageRequest.of(0, 20);
+
+    private static final String URL = "/api/v1/authors";
 
     private MockMvc mockMvc;
 
@@ -63,5 +68,14 @@ public class AuthorResourceTest {
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setViewResolvers((s, locale) -> new MappingJackson2JsonView())
                 .build();
+    }
+
+    @Test
+    @DisplayName("Must return 200 Ok status when searching for all authors")
+    void whenGETIsCalledToFindAllAuthorsThenReturnOkStatus() throws Exception {
+        when(authorService.findAll(pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URL)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }
