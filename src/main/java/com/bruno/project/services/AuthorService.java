@@ -31,6 +31,7 @@ public class AuthorService {
     }
 
     public AuthorDTO save(AuthorDTO authorDTO) {
+        authorDTO.setId(null);
         checkRegisteredEmail(authorDTO.getEmail());
         return new AuthorDTO(authorRepository.save(new Author(authorDTO)));
     }

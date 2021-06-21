@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class BookDTO implements Serializable {
     @NotEmpty(message = "You need to enter the book's title!")
     private String title;
 
-    @NotEmpty(message = "How many pages does the book have?")
+    @NotNull(message = "How many pages does the book have?")
     private Integer printLength;
 
     @NotEmpty(message = "What is the main language of the book?")

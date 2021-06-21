@@ -6,6 +6,7 @@ import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import com.bruno.project.resource.BookResource;
 import com.bruno.project.services.BookService;
+import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,13 +25,20 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static com.bruno.project.utils.JsonConversionUtil.asJsonString;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class BookResourceTest {
+
+    private List<Book> list = new ArrayList<Book>();
 
     private Author author = new Author(
             1l,
@@ -40,12 +48,12 @@ public class BookResourceTest {
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
             null,
-            null
+            list
     );
 
-    private List<Author> authors = new ArrayList<>();
+    private List<Author> authors = Arrays.asList(author);
 
-    private Book expectedBook = new Book(
+    private Book givenBook = new Book(
             1L,
             "978-0099520320",
             "The Bat",
@@ -58,7 +66,7 @@ public class BookResourceTest {
             authors
     );
 
-    private BookDTO givenBook = new BookDTO(expectedBook);
+    private BookDTO expectedBook = new BookDTO(givenBook);
 
     private static final String URL = "/api/v1/books";
 
@@ -116,5 +124,33 @@ public class BookResourceTest {
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/publisher?text=" + givenBook.getPublisher())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Should return 201 created status")
+    void whenPOSTIsCalledThenReturnCreatedStatus() throws Exception {
+        when(bookService.save(expectedBook)).thenReturn(expectedBook);
+        mockMvc.perform(post(URL)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(expectedBook)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title", is(expectedBook.getTitle())))
+                .andExpect(jsonPath("$.isbn", is(expectedBook.getIsbn())))
+                .andExpect(jsonPath("$.printLength", is(expectedBook.getPrintLength())))
+                .andExpect(jsonPath("$.language", is(expectedBook.getLanguage())))
+                .andExpect(jsonPath("$.publicationYear", is(expectedBook.getPublicationYear())))
+                .andExpect(jsonPath("$.publisher", is(expectedBook.getPublisher())))
+                .andExpect(jsonPath("$.urlCover", is(expectedBook.getUrlCover())))
+                .andExpect(jsonPath("$.bookGenre", is(expectedBook.getBookGenre().toString())));
+    }
+
+    @Test
+    @DisplayName("Must throw a BookAlreadyRegisteredException exception when a registered ISBN is provided")
+    void whenPOSTIsCalledWithARegisteredISBNThenThrowException() throws Exception {
+        when(bookService.save(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
+        mockMvc.perform(post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(expectedBook)))
+                .andExpect(status().isBadRequest());
     }
 }

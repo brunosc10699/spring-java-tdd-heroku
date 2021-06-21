@@ -40,6 +40,7 @@ public class BookService {
     }
 
     public BookDTO save(BookDTO bookDTO){
+        bookDTO.setId(null);
         checkRegisteredISBN(bookDTO.getIsbn());
         return new BookDTO(bookRepository.save(new Book(bookDTO)));
     }
