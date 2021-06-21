@@ -5,6 +5,7 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorServiceTest {
@@ -116,7 +117,7 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw a AuthorEmailAlreadyRegisteredException exception " +
+    @DisplayName("Should throw an AuthorEmailAlreadyRegisteredException exception " +
             "when trying to create an author with a registered email")
     void whenSaveMethodIsCalledWithARegisteredEmailThenThrowException() {
         when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
@@ -141,10 +142,27 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw a AuthorEmailAlreadyRegisteredException exception " +
+    @DisplayName("Should throw an AuthorEmailAlreadyRegisteredException exception " +
             "when trying to update an author with a new already registered email")
     void whenUpdateByIdMethodIsCalledWithANewRegisteredEmailThenThrowException() {
         when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
         assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.updateById(givenAuthor));
+    }
+
+    @Test
+    @DisplayName("Should delete an author by its id")
+    void whenDeleteByIdMethodIsCalledWithARegisteredIdThenDeleteAnAuthor() {
+        when(authorRepository.getById(expectedAuthor.getId())).thenReturn(expectedAuthor);
+        doNothing().when(authorRepository).deleteById(expectedAuthor.getId());
+        authorService.deleteById(givenAuthor.getId());
+        verify(authorRepository, times(1)).getById(expectedAuthor.getId());
+        verify(authorRepository, times(1)).deleteById(expectedAuthor.getId());
+    }
+
+    @Test
+    @DisplayName("Should throw an AuthorNotFoundException exception when an unregistered id is supplied")
+    void whenAnUnregisteredIdIsGivenToDeleteAnAuthorThenThrowException() {
+        when(authorRepository.getById(expectedAuthor.getId())).thenReturn(null);
+        assertThrows(AuthorNotFoundException.class, () -> authorService.deleteById(givenAuthor.getId()));
     }
 }

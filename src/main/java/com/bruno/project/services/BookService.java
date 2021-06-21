@@ -1,8 +1,6 @@
 package com.bruno.project.services;
 
-import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.dto.BookDTO;
-import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
@@ -13,9 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -55,23 +51,17 @@ public class BookService {
     }
 
     public void deleteById(Long id){
-        if(checkRegisteredId(id)){
-            bookRepository.deleteById(id);
-        }// else throw new BookNotFoundException(id);
+        if(checkRegisteredId(id)) bookRepository.deleteById(id);
     }
 
     private Boolean checkRegisteredId(Long id){
         Book book = bookRepository.getById(id);
-        if(book == null){
-            throw new BookNotFoundException(id);
-        }
+        if(book == null) throw new BookNotFoundException(id);
         return true;
     }
 
     private void checkRegisteredISBN(String isbn){
         Optional<Book> book = bookRepository.findByIsbn(isbn);
-        if(book.isPresent()){
-            throw new BookAlreadyRegisteredException(isbn);
-        }
+        if(book.isPresent()) throw new BookAlreadyRegisteredException(isbn);
     }
 }
