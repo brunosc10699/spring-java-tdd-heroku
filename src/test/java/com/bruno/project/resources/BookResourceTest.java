@@ -108,4 +108,13 @@ public class BookResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Should return 200 Ok status when searching by publisher")
+    void whenGETIsCalledToFindBooksByPublisherThenReturnOkStatus() throws Exception {
+        when(bookService.findByPublisherIgnoreCase(givenBook.getPublisher(), pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/publisher?text=" + givenBook.getPublisher())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
