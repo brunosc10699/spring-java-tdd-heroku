@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
-    Page<Author> findByNameIgnoreCase(String name, Pageable pageable);
+    Page<Author> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     Optional<Author> findByEmailIgnoreCase(String email);
 }

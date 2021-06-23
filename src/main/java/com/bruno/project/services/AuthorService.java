@@ -25,8 +25,8 @@ public class AuthorService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AuthorDTO> findByNameIgnoreCase(String name, Pageable pageable) {
-        return authorRepository.findByNameIgnoreCase(name, pageable).map(AuthorDTO::new);
+    public Page<AuthorDTO> findByNameContainingIgnoreCase(String name, Pageable pageable) {
+        return authorRepository.findByNameContainingIgnoreCase(name, pageable).map(AuthorDTO::new);
     }
 
     public AuthorDTO save(AuthorDTO authorDTO) {

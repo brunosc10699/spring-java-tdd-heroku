@@ -25,24 +25,24 @@ public class BookResource {
     }
 
     @GetMapping(value = "/title")
-    public ResponseEntity<Page<BookDTO>> findByTitleIgnoreCase(
+    public ResponseEntity<Page<BookDTO>> findByTitleContainingIgnoreCase(
             @RequestParam(value = "text", defaultValue = "") String title, Pageable pageable
     ){
-        return ResponseEntity.ok(bookService.findByTitleIgnoreCase(title, pageable));
+        return ResponseEntity.ok(bookService.findByTitleContainingIgnoreCase(title, pageable));
     }
 
     @GetMapping(value = "/language")
-    public ResponseEntity<Page<BookDTO>> findByLanguageIgnoreCase(
+    public ResponseEntity<Page<BookDTO>> findByLanguageContainingIgnoreCase(
             @RequestParam(value = "text", defaultValue = "") String language, Pageable pageable
     ){
-        return ResponseEntity.ok(bookService.findByLanguageIgnoreCase(language, pageable));
+        return ResponseEntity.ok(bookService.findByLanguageContainingIgnoreCase(language, pageable));
     }
 
     @GetMapping(value = "/publisher")
-    public ResponseEntity<Page<BookDTO>> findByPublisherIgnoreCase(
+    public ResponseEntity<Page<BookDTO>> findByPublisherContainingIgnoreCase(
             @RequestParam(value = "text", defaultValue = "") String publisher, Pageable pageable
     ){
-        return ResponseEntity.ok(bookService.findByPublisherIgnoreCase(publisher, pageable));
+        return ResponseEntity.ok(bookService.findByPublisherContainingIgnoreCase(publisher, pageable));
     }
 
     @PostMapping

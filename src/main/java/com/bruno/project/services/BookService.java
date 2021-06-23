@@ -25,18 +25,18 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BookDTO> findByTitleIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByTitleIgnoreCase(text, pageable).map(BookDTO::new);
+    public Page<BookDTO> findByTitleContainingIgnoreCase(String text, Pageable pageable){
+        return bookRepository.findByTitleContainingIgnoreCase(text, pageable).map(BookDTO::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<BookDTO> findByLanguageIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByLanguageIgnoreCase(text, pageable).map(BookDTO::new);
+    public Page<BookDTO> findByLanguageContainingIgnoreCase(String text, Pageable pageable){
+        return bookRepository.findByLanguageContainingIgnoreCase(text, pageable).map(BookDTO::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<BookDTO> findByPublisherIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByPublisherIgnoreCase(text, pageable).map(BookDTO::new);
+    public Page<BookDTO> findByPublisherContainingIgnoreCase(String text, Pageable pageable){
+        return bookRepository.findByPublisherContainingIgnoreCase(text, pageable).map(BookDTO::new);
     }
 
     public BookDTO save(BookDTO bookDTO){

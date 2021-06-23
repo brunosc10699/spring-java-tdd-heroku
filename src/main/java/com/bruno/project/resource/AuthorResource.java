@@ -27,7 +27,7 @@ public class AuthorResource {
     public ResponseEntity<Page<AuthorDTO>> findByNameIgnoreCase(
             @RequestParam(value = "text", defaultValue = "") String name, Pageable pageable
     ){
-        return ResponseEntity.ok(authorService.findByNameIgnoreCase(name, pageable));
+        return ResponseEntity.ok(authorService.findByNameContainingIgnoreCase(name, pageable));
     }
 
     @PostMapping
