@@ -37,7 +37,8 @@ public class Author implements Serializable {
 
     private String phone;
 
-    @Column(nullable = false)
+    @Lob @Basic(fetch = FetchType.LAZY)
+    @Column(nullable = false, length = 1000)
     private String biography;
 
     private String urlPicture;

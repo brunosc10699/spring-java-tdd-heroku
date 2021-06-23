@@ -31,6 +31,8 @@ public class AuthorService {
 
     public AuthorDTO save(AuthorDTO authorDTO) {
         authorDTO.setId(null);
+        if(authorDTO.getUrlPicture() == null)
+            authorDTO.setUrlPicture("https://live.staticflickr.com/65535/51265117593_c76eb4ccb8_n.jpg");
         checkRegisteredEmail(authorDTO.getEmail());
         return new AuthorDTO(authorRepository.save(new Author(authorDTO)));
     }

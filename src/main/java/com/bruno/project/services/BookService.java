@@ -41,6 +41,8 @@ public class BookService {
 
     public BookDTO save(BookDTO bookDTO){
         bookDTO.setId(null);
+        if(bookDTO.getUrlCover() == null)
+            bookDTO.setUrlCover("https://live.staticflickr.com/65535/51264896706_e66beed079_n.jpg");
         checkRegisteredISBN(bookDTO.getIsbn());
         return new BookDTO(bookRepository.save(new Book(bookDTO)));
     }
