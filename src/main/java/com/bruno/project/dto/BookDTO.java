@@ -26,6 +26,7 @@ public class BookDTO implements Serializable {
     private Long id;
 
     @ISBN(message = "What you entered doesn't look like an ISBN!")
+    @NotEmpty(message = "ISBN is required!")
     private String isbn;
 
     @NotEmpty(message = "You need to enter the book's title!")
