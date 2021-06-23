@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -36,12 +37,14 @@ public class BookDTO implements Serializable {
     @NotEmpty(message = "What is the main language of the book?")
     private String language;
 
-    @Size(min = 4, max = 4, message = "The publication year is required and must have 4 characters!")
+    @NotEmpty(message = "The publication year is required!")
     private String publicationYear;
 
     private String publisher;
 
     private String urlCover;
+
+    private String synopsis;
 
     private BookGenre bookGenre;
 

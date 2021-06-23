@@ -45,6 +45,10 @@ public class Book implements Serializable {
 
     private String urlCover;
 
+    @Lob @Basic(fetch = FetchType.LAZY)
+    @Column(length = 1000)
+    private String synopsis;
+
     private BookGenre bookGenre;
 
     @ManyToMany
