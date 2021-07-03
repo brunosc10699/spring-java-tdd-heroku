@@ -45,6 +45,10 @@ public class BookService {
         return bookRepository.findByPublisherContainingIgnoreCase(text, pageable).map(BookDTO::new);
     }
 
+    public Page<BookDTO> findBooksByAuthorName(String author, Pageable pageable){
+        return bookRepository.findBooksByAuthorName(author, pageable).map(BookDTO::new);
+    }
+
     public BookDTO save(BookDTO bookDTO){
         checkRegisteredISBN(bookDTO.getIsbn());
         bookDTO.setId(null);

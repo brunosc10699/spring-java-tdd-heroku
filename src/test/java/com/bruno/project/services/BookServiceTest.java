@@ -152,6 +152,26 @@ public class BookServiceTest {
     }
 
     @Test
+    @DisplayName("Should return a Page of Books searched by author name")
+    void whenFindBooksByAuthorNameIsCalledThenReturnAPageOfBooks() {
+        when(bookRepository.findBooksByAuthorName("searchedText", pageRequest))
+                .thenReturn(page);
+        pageDTO = bookService.findBooksByAuthorName("searchedText", pageRequest);
+        assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
+        assertThat(pageDTO.getSize(), is(equalTo(1)));
+        assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(bookDTO)));
+    }
+
+    @Test
+    @DisplayName("Should return an empty Page of Books when an author name is entered")
+    void whenFindBooksByAuthorNameIsCalledThenReturnAnEmptyPageOfBooks() {
+        when(bookRepository.findBooksByAuthorName("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findBooksByAuthorName("searchedText", pageRequest);
+        assertThat(pageDTO.getContent(), is(empty()));
+    }
+
+    @Test
     @DisplayName("Should save a new Book")
     void whenANewBookIsGivenThenItShouldBeSaved() {
         when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.empty());
