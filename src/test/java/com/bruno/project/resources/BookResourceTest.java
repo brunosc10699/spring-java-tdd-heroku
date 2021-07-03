@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,8 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class BookResourceTest {
 
-    private List<Book> list = new ArrayList<Book>();
-
     private Author author = new Author(
             1l,
             "Jo Nesbø",
@@ -48,8 +45,7 @@ public class BookResourceTest {
             "jonesbo@jonesbo.com",
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
-            null,
-            list
+            null
     );
 
     private List<Author> authors = Arrays.asList(author);
@@ -63,8 +59,8 @@ public class BookResourceTest {
             "1997",
             "Harvill Secker",
             null,
-            BookGenre.toEnum(6),
-            authors
+            null,
+            BookGenre.toEnum(6)
     );
 
     private BookDTO expectedBook = new BookDTO(givenBook);
@@ -103,7 +99,7 @@ public class BookResourceTest {
     @Test
     @DisplayName("Should return 200 Ok status when searching by title")
     void whenGETIsCalledToFindBooksByTitleThenReturnOkStatus() throws Exception {
-        when(bookService.findByTitleIgnoreCase(givenBook.getTitle(), pageRequest)).thenReturn(page);
+        when(bookService.findByTitleContainingIgnoreCase(givenBook.getTitle(), pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/title?text=" + givenBook.getTitle())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -112,7 +108,7 @@ public class BookResourceTest {
     @Test
     @DisplayName("Should return 200 Ok status when searching by language")
     void whenGETIsCalledToFindBooksByLanguageThenReturnOkStatus() throws Exception {
-        when(bookService.findByLanguageIgnoreCase(givenBook.getLanguage(), pageRequest)).thenReturn(page);
+        when(bookService.findByLanguageContainingIgnoreCase(givenBook.getLanguage(), pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/language?text=" + givenBook.getLanguage())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -121,7 +117,7 @@ public class BookResourceTest {
     @Test
     @DisplayName("Should return 200 Ok status when searching by publisher")
     void whenGETIsCalledToFindBooksByPublisherThenReturnOkStatus() throws Exception {
-        when(bookService.findByPublisherIgnoreCase(givenBook.getPublisher(), pageRequest)).thenReturn(page);
+        when(bookService.findByPublisherContainingIgnoreCase(givenBook.getPublisher(), pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/publisher?text=" + givenBook.getPublisher())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

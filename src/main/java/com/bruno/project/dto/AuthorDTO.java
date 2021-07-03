@@ -1,7 +1,7 @@
 package com.bruno.project.dto;
 
 import com.bruno.project.entities.Author;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,11 +12,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class AuthorDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -41,6 +39,16 @@ public class AuthorDTO implements Serializable {
 
     private List<BookDTO> books = new ArrayList<>();
 
+    public AuthorDTO(Long id, String name, LocalDate birthDate, String email, String phone, String biography, String urlPicture) {
+        this.id = id;
+        this.name = name;
+        this.birthDate = birthDate;
+        this.email = email;
+        this.phone = phone;
+        this.biography = biography;
+        this.urlPicture = urlPicture;
+    }
+
     public AuthorDTO(Author author){
         id = author.getId();
         name = author.getName();
@@ -49,6 +57,10 @@ public class AuthorDTO implements Serializable {
         phone = author.getPhone();
         biography = author.getBiography();
         urlPicture = author.getUrlPicture();
-        books = author.getBooks().stream().map(BookDTO::new).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<BookDTO> getBooks() {
+        return books;
     }
 }

@@ -1,8 +1,6 @@
 package com.bruno.project.entities;
 
-import com.bruno.project.dto.AuthorDTO;
-import com.bruno.project.dto.BookDTO;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,15 +8,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_author")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Author implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,17 +38,17 @@ public class Author implements Serializable {
 
     private String urlPicture;
 
-    @ManyToMany(mappedBy = "authors")
+    @JsonIgnore
+    @ManyToMany(mappedBy = "authors", cascade = CascadeType.ALL)
     private List<Book> books = new ArrayList<>();
 
-    public Author(AuthorDTO authorDTO) {
-        id = authorDTO.getId();
-        name = authorDTO.getName();
-        birthDate = authorDTO.getBirthDate();
-        email = authorDTO.getEmail();
-        phone = authorDTO.getPhone();
-        biography = authorDTO.getBiography();
-        urlPicture = authorDTO.getUrlPicture();
-        books = authorDTO.getBooks().stream().map(Book::new).collect(Collectors.toList());
+    public Author(Long id, String name, LocalDate birthDate, String email, String phone, String biography, String urlPicture) {
+        this.id = id;
+        this.name = name;
+        this.birthDate = birthDate;
+        this.email = email;
+        this.phone = phone;
+        this.biography = biography;
+        this.urlPicture = urlPicture;
     }
 }

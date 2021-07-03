@@ -24,27 +24,39 @@ public class AuthorService {
         return authorRepository.findAll(pageable).map(AuthorDTO::new);
     }
 
-    @Transactional(readOnly = true)
     public Page<AuthorDTO> findByNameContainingIgnoreCase(String name, Pageable pageable) {
         return authorRepository.findByNameContainingIgnoreCase(name, pageable).map(AuthorDTO::new);
     }
 
     public AuthorDTO save(AuthorDTO authorDTO) {
-        authorDTO.setId(null);
-        if(authorDTO.getUrlPicture() == null)
-            authorDTO.setUrlPicture("https://live.staticflickr.com/65535/51265117593_c76eb4ccb8_n.jpg");
         checkRegisteredEmail(authorDTO.getEmail());
-        return new AuthorDTO(authorRepository.save(new Author(authorDTO)));
+        authorDTO.setId(null);
+        if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
+        Author author = fromDTO(authorDTO);
+        return new AuthorDTO(authorRepository.save(author));
     }
 
-    public AuthorDTO updateById(AuthorDTO authorDTO) {
+    public AuthorDTO update(AuthorDTO authorDTO) {
         checkRegisteredEmail(authorDTO.getEmail());
         checkRegisteredId(authorDTO.getId());
-        return new AuthorDTO(authorRepository.save(new Author(authorDTO)));
+        Author author = fromDTO(authorDTO);
+        return new AuthorDTO(authorRepository.save(author));
     }
 
     public void deleteById(Long id) {
         if(checkRegisteredId(id)) authorRepository.deleteById(id);
+    }
+
+    private Author fromDTO(AuthorDTO authorDTO) {
+        return new Author(
+                authorDTO.getId(),
+                authorDTO.getName(),
+                authorDTO.getBirthDate(),
+                authorDTO.getEmail(),
+                authorDTO.getPhone(),
+                authorDTO.getBiography(),
+                authorDTO.getUrlPicture()
+        );
     }
 
     private Boolean checkRegisteredId(Long id){

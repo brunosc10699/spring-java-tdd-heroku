@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -31,18 +32,18 @@ public class AuthorResource {
     }
 
     @PostMapping
-    public ResponseEntity<AuthorDTO> save(@RequestBody AuthorDTO authorDTO){
+    public ResponseEntity<AuthorDTO> save(@Valid @RequestBody AuthorDTO authorDTO){
         authorDTO = authorService.save(authorDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/id")
+                .path("/{id}")
                 .buildAndExpand(authorDTO)
                 .toUri();
         return ResponseEntity.created(uri).body(authorDTO);
     }
 
     @PutMapping
-    public ResponseEntity<AuthorDTO> updateById(@RequestBody AuthorDTO authorDTO){
-        return ResponseEntity.ok(authorService.updateById(authorDTO));
+    public ResponseEntity<AuthorDTO> update(@Valid @RequestBody AuthorDTO authorDTO){
+        return ResponseEntity.ok(authorService.update(authorDTO));
     }
 
     @DeleteMapping(value = "/{id}")

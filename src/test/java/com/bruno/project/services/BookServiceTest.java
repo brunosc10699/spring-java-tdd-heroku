@@ -40,7 +40,6 @@ public class BookServiceTest {
             "jonesbo@jonesbo.com",
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
-            null,
             null
     );
 
@@ -55,8 +54,8 @@ public class BookServiceTest {
             "1997",
             "Harvill Secker",
             null,
-            BookGenre.toEnum(6),
-            authors
+            null,
+            BookGenre.toEnum(6)
     );
 
     private BookDTO givenBook = new BookDTO(expectedBook);
@@ -97,9 +96,9 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should return a Page of Books searched by title")
     void whenFindByTitleIgnoreCaseIsCalledThenReturnAPageOfBooks() {
-        when(bookRepository.findByTitleIgnoreCase("searchedText", pageRequest))
+        when(bookRepository.findByTitleContainingIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
-        pageDTO = bookService.findByTitleIgnoreCase("searchedText", pageRequest);
+        pageDTO = bookService.findByTitleContainingIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
@@ -109,17 +108,17 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should return an empty Page of Books when a language is entered")
     void whenFindByTitleIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
-        when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
-        pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
+        when(bookRepository.findByLanguageContainingIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByLanguageContainingIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 
     @Test
     @DisplayName("Should return a Page of Books searched by language")
     void whenFindByLanguageIgnoreCaseIsCalledThenReturnAPageOfBooks() {
-        when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest))
+        when(bookRepository.findByLanguageContainingIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
-        pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
+        pageDTO = bookService.findByLanguageContainingIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
@@ -129,17 +128,17 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should return an empty Page of Books when a language is entered")
     void whenFindByLanguageIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
-        when(bookRepository.findByLanguageIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
-        pageDTO = bookService.findByLanguageIgnoreCase("searchedText", pageRequest);
+        when(bookRepository.findByLanguageContainingIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByLanguageContainingIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 
     @Test
     @DisplayName("Should return a Page of Books searched by publisher")
     void whenFindByPublisherIgnoreCaseIsCalledThenReturnAPageOfBooks() {
-        when(bookRepository.findByPublisherIgnoreCase("searchedText", pageRequest))
+        when(bookRepository.findByPublisherContainingIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
-        pageDTO = bookService.findByPublisherIgnoreCase("searchedText", pageRequest);
+        pageDTO = bookService.findByPublisherContainingIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
@@ -149,8 +148,8 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should return an empty Page of Books when a publisher is entered")
     void whenFindByPublisherIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
-        when(bookRepository.findByPublisherIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
-        pageDTO = bookService.findByPublisherIgnoreCase("searchedText", pageRequest);
+        when(bookRepository.findByPublisherContainingIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
+        pageDTO = bookService.findByPublisherContainingIgnoreCase("searchedText", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 

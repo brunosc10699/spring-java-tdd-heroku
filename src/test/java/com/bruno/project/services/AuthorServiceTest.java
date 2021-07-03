@@ -2,7 +2,6 @@ package com.bruno.project.services;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
-import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
@@ -17,9 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,24 +28,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class AuthorServiceTest {
 
-    private List<Book> list = new ArrayList<>();
-
-    private Author expectedAuthor = new Author(
-            1l,
+    private Author author = new Author(
+            null,
             "Jo Nesbø",
             LocalDate.parse("1960-03-29"),
             "jonesbo@jonesbo.com",
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
-            null,
-            list
+            "51265117593_c76eb4ccb8_n.jpg"
     );
 
-    private AuthorDTO givenAuthor = new AuthorDTO(expectedAuthor);
+    private AuthorDTO authorDTO = new AuthorDTO(author);
 
-    private AuthorDTO authorDTO;
-
-    private Page<Author> page = new PageImpl<Author>(Collections.singletonList(expectedAuthor));
+    private Page<Author> page = new PageImpl<Author>(Collections.singletonList(author));
 
     private Page<AuthorDTO> pageDTO;
 
@@ -69,7 +61,7 @@ public class AuthorServiceTest {
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
-        assertThat(pageDTO.getContent().get(0), is(equalTo(givenAuthor)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(authorDTO)));
     }
 
     @Test
@@ -83,86 +75,85 @@ public class AuthorServiceTest {
     @Test
     @DisplayName("Should return a page of authors searched by name")
     void whenFindByNameIgnoreCaseIsCalledThenReturnAPageOfAuthors() {
-        when(authorRepository.findByNameIgnoreCase("name", pageRequest)).thenReturn(page);
-        pageDTO = authorService.findByNameIgnoreCase("name", pageRequest);
+        when(authorRepository.findByNameContainingIgnoreCase("name", pageRequest)).thenReturn(page);
+        pageDTO = authorService.findByNameContainingIgnoreCase("name", pageRequest);
         assertThat(pageDTO.getContent(), is(not(empty())));
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
-        assertThat(pageDTO.getContent().get(0), is(equalTo(givenAuthor)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(authorDTO)));
     }
 
     @Test
     @DisplayName("Should return an empty page of authors")
     void whenFindByNameIgnoreCaseIsCalledThenReturnAnEmptyPage() {
-        when(authorRepository.findByNameIgnoreCase("name", pageRequest)).thenReturn(Page.empty());
-        pageDTO = authorService.findByNameIgnoreCase("name", pageRequest);
+        when(authorRepository.findByNameContainingIgnoreCase("name", pageRequest)).thenReturn(Page.empty());
+        pageDTO = authorService.findByNameContainingIgnoreCase("name", pageRequest);
         assertThat(pageDTO.getContent(), is(empty()));
     }
 
     @Test
     @DisplayName("Should create a new author")
     void whenSaveMethodIsCalledThenShouldCreateANewAuthor() {
-        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.empty());
-        when(authorRepository.save(expectedAuthor)).thenReturn(expectedAuthor);
-        authorDTO = authorService.save(givenAuthor);
-        assertThat(authorDTO.getId(), is(equalTo(expectedAuthor.getId())));
-        assertThat(authorDTO.getName(), is(equalTo(expectedAuthor.getName())));
-        assertThat(authorDTO.getBirthDate(), is(equalTo(expectedAuthor.getBirthDate())));
-        assertThat(authorDTO.getEmail(), is(equalTo(expectedAuthor.getEmail())));
-        assertThat(authorDTO.getPhone(), is(equalTo(expectedAuthor.getPhone())));
-        assertThat(authorDTO.getBiography(), is(equalTo(expectedAuthor.getBiography())));
-        assertThat(authorDTO.getUrlPicture(), is(equalTo(expectedAuthor.getUrlPicture())));
-        assertThat(authorDTO.getBooks(), is(equalTo(expectedAuthor.getBooks())));
+        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.empty());
+        when(authorRepository.save(author)).thenReturn(author);
+        authorDTO = authorService.save(authorDTO);
+        assertThat(authorDTO.getId(), is(equalTo(author.getId())));
+        assertThat(authorDTO.getName(), is(equalTo(author.getName())));
+        assertThat(authorDTO.getBirthDate(), is(equalTo(author.getBirthDate())));
+        assertThat(authorDTO.getEmail(), is(equalTo(author.getEmail())));
+        assertThat(authorDTO.getPhone(), is(equalTo(author.getPhone())));
+        assertThat(authorDTO.getBiography(), is(equalTo(author.getBiography())));
+        assertThat(authorDTO.getUrlPicture(), is(equalTo(author.getUrlPicture())));
     }
 
     @Test
     @DisplayName("Should throw an AuthorEmailAlreadyRegisteredException exception " +
             "when trying to create an author with a registered email")
     void whenSaveMethodIsCalledWithARegisteredEmailThenThrowException() {
-        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
-        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.save(givenAuthor));
+        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.of(author));
+        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.save(authorDTO));
     }
 
     @Test
     @DisplayName("Should update author data by its id")
-    void whenUpdateByIdMethodIsCalledThenReturnAnUpdatedAuthor() {
-        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.empty());
-        when(authorRepository.getById(expectedAuthor.getId())).thenReturn(expectedAuthor);
-        when(authorRepository.save(expectedAuthor)).thenReturn(expectedAuthor);
-        authorDTO = authorService.updateById(givenAuthor);
-        assertThat(authorDTO.getId(), is(equalTo(expectedAuthor.getId())));
-        assertThat(authorDTO.getName(), is(equalTo(expectedAuthor.getName())));
-        assertThat(authorDTO.getBirthDate(), is(equalTo(expectedAuthor.getBirthDate())));
-        assertThat(authorDTO.getEmail(), is(equalTo(expectedAuthor.getEmail())));
-        assertThat(authorDTO.getPhone(), is(equalTo(expectedAuthor.getPhone())));
-        assertThat(authorDTO.getBiography(), is(equalTo(expectedAuthor.getBiography())));
-        assertThat(authorDTO.getUrlPicture(), is(equalTo(expectedAuthor.getUrlPicture())));
-        assertThat(authorDTO.getBooks(), is(equalTo(expectedAuthor.getBooks())));
+    void whenupdateMethodIsCalledThenReturnAnUpdatedAuthor() {
+        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.empty());
+        when(authorRepository.getById(author.getId())).thenReturn(author);
+        when(authorRepository.save(author)).thenReturn(author);
+        authorDTO = authorService.update(authorDTO);
+        assertThat(authorDTO.getId(), is(equalTo(author.getId())));
+        assertThat(authorDTO.getName(), is(equalTo(author.getName())));
+        assertThat(authorDTO.getBirthDate(), is(equalTo(author.getBirthDate())));
+        assertThat(authorDTO.getEmail(), is(equalTo(author.getEmail())));
+        assertThat(authorDTO.getPhone(), is(equalTo(author.getPhone())));
+        assertThat(authorDTO.getBiography(), is(equalTo(author.getBiography())));
+        assertThat(authorDTO.getUrlPicture(), is(equalTo(author.getUrlPicture())));
+        assertThat(authorDTO.getBooks(), is(equalTo(author.getBooks())));
     }
 
     @Test
     @DisplayName("Should throw an AuthorEmailAlreadyRegisteredException exception " +
             "when trying to update an author with a new already registered email")
-    void whenUpdateByIdMethodIsCalledWithANewRegisteredEmailThenThrowException() {
-        when(authorRepository.findByEmailIgnoreCase(expectedAuthor.getEmail())).thenReturn(Optional.of(expectedAuthor));
-        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.updateById(givenAuthor));
+    void whenupdateMethodIsCalledWithANewRegisteredEmailThenThrowException() {
+        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.of(author));
+        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.update(authorDTO));
     }
 
     @Test
     @DisplayName("Should delete an author by its id")
     void whenDeleteByIdMethodIsCalledWithARegisteredIdThenDeleteAnAuthor() {
-        when(authorRepository.getById(expectedAuthor.getId())).thenReturn(expectedAuthor);
-        doNothing().when(authorRepository).deleteById(expectedAuthor.getId());
-        authorService.deleteById(givenAuthor.getId());
-        verify(authorRepository, times(1)).getById(expectedAuthor.getId());
-        verify(authorRepository, times(1)).deleteById(expectedAuthor.getId());
+        when(authorRepository.getById(author.getId())).thenReturn(author);
+        doNothing().when(authorRepository).deleteById(author.getId());
+        authorService.deleteById(authorDTO.getId());
+        verify(authorRepository, times(1)).getById(author.getId());
+        verify(authorRepository, times(1)).deleteById(author.getId());
     }
 
     @Test
     @DisplayName("Should throw an AuthorNotFoundException exception when an unregistered id is supplied")
     void whenAnUnregisteredIdIsGivenToDeleteAnAuthorThenThrowException() {
-        when(authorRepository.getById(expectedAuthor.getId())).thenReturn(null);
-        assertThrows(AuthorNotFoundException.class, () -> authorService.deleteById(givenAuthor.getId()));
+        when(authorRepository.getById(author.getId())).thenReturn(null);
+        assertThrows(AuthorNotFoundException.class, () -> authorService.deleteById(authorDTO.getId()));
     }
 }

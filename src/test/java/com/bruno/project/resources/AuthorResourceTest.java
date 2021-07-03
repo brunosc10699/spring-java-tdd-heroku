@@ -2,7 +2,6 @@ package com.bruno.project.resources;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
-import com.bruno.project.entities.Book;
 import com.bruno.project.resource.AuthorResource;
 import com.bruno.project.services.AuthorService;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
@@ -24,8 +23,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.bruno.project.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
@@ -37,8 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class AuthorResourceTest {
 
-    private List<Book> list = new ArrayList<>();
-
     private Author expectedAuthor = new Author(
             1l,
             "Jo Nesbø",
@@ -46,8 +41,7 @@ public class AuthorResourceTest {
             "jonesbo@jonesbo.com",
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
-            null,
-            list
+            null
     );
 
     private AuthorDTO givenAuthor = new AuthorDTO(expectedAuthor);
@@ -88,7 +82,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("Must return 200 Ok status when searching for authors by name")
     void whenGETIsCalledToFindAuthorsByNameThenReturnOkStatus() throws Exception {
-        when(authorService.findByNameIgnoreCase(givenAuthor.getName(), pageRequest)).thenReturn(page);
+        when(authorService.findByNameContainingIgnoreCase(givenAuthor.getName(), pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/name?text=" + givenAuthor.getName())
         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -122,7 +116,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("Must return 200 Ok status when updating author data")
     void whenPUTIsCalledThenReturnOkStatus() throws Exception {
-        when(authorService.updateById(givenAuthor)).thenReturn(givenAuthor);
+        when(authorService.update(givenAuthor)).thenReturn(givenAuthor);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(givenAuthor)))
@@ -137,7 +131,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("Must throw 400 BadRequest status when trying to update author data with an already registered email")
     void whenPUTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
-        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).updateById(givenAuthor);
+        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).update(givenAuthor);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
@@ -147,7 +141,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("Must throw 404 NotFound status when trying to update author data with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
-        doThrow(AuthorNotFoundException.class).when(authorService).updateById(givenAuthor);
+        doThrow(AuthorNotFoundException.class).when(authorService).update(givenAuthor);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))

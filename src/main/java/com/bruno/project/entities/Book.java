@@ -2,22 +2,18 @@ package com.bruno.project.entities;
 
 import com.bruno.project.dto.BookDTO;
 import com.bruno.project.enums.BookGenre;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_book")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Book implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,13 +47,26 @@ public class Book implements Serializable {
 
     private BookGenre bookGenre;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tb_book_author",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
     @Column(nullable = false)
     private List<Author> authors = new ArrayList<>();
+
+    public Book(Long id, String isbn, String title, Integer printLength, String language, String publicationYear, String publisher, String urlCover, String synopsis, BookGenre bookGenre) {
+        this.id = id;
+        this.isbn = isbn;
+        this.title = title;
+        this.printLength = printLength;
+        this.language = language;
+        this.publicationYear = publicationYear;
+        this.publisher = publisher;
+        this.urlCover = urlCover;
+        this.synopsis = synopsis;
+        this.bookGenre = bookGenre;
+    }
 
     public Book(BookDTO bookDTO) {
         id = bookDTO.getId();
@@ -69,6 +78,5 @@ public class Book implements Serializable {
         publisher = bookDTO.getPublisher();
         urlCover = bookDTO.getUrlCover();
         bookGenre = bookDTO.getBookGenre();
-        authors = bookDTO.getAuthors().stream().map(Author::new).collect(Collectors.toList());
     }
 }
