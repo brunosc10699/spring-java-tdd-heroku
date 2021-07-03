@@ -50,15 +50,15 @@ public class BookResource {
         bookDTO = bookService.save(bookDTO);
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/id")
+                .path("/{id}")
                 .buildAndExpand(bookDTO.getId())
                 .toUri();
         return ResponseEntity.created(uri).body(bookDTO);
     }
 
     @PutMapping
-    public ResponseEntity<BookDTO> updateById(@Valid @RequestBody BookDTO bookDTO){
-        return ResponseEntity.ok(bookService.updateById(bookDTO));
+    public ResponseEntity<BookDTO> update(@Valid @RequestBody BookDTO bookDTO){
+        return ResponseEntity.ok(bookService.update(bookDTO));
     }
 
     @DeleteMapping(value = "/{id}")

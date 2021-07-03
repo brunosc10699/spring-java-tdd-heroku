@@ -34,39 +34,37 @@ import static org.mockito.Mockito.*;
 public class BookServiceTest {
 
     private Author author = new Author(
-            1l,
+            null,
             "Jo Nesbø",
             LocalDate.parse("1960-03-29"),
             "jonesbo@jonesbo.com",
             null,
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
-            null
+            "0284334234.jpg"
     );
 
     private List<Author> authors = new ArrayList<>();
 
-    private Book expectedBook = new Book(
-            1L,
+    private Book book = new Book(
+            null,
             "978-0099520320",
             "The Bat",
             432,
             "English",
             "1997",
             "Harvill Secker",
-            null,
+            "51264896706_e66beed079_n.jpg",
             null,
             BookGenre.toEnum(6)
     );
 
-    private BookDTO givenBook = new BookDTO(expectedBook);
+    private BookDTO bookDTO = new BookDTO(book);
 
-    private Page<Book> page = new PageImpl<Book>(Collections.singletonList(expectedBook));
+    private Page<Book> page = new PageImpl<Book>(Collections.singletonList(book));
 
     private Page<BookDTO> pageDTO;
 
     private PageRequest pageRequest = PageRequest.of(0, 1);
-
-    private BookDTO bookDTO;
 
     @Mock
     private BookRepository bookRepository;
@@ -82,7 +80,7 @@ public class BookServiceTest {
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
-        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(bookDTO)));
     }
 
     @Test
@@ -102,7 +100,7 @@ public class BookServiceTest {
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
-        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(bookDTO)));
     }
 
     @Test
@@ -122,7 +120,7 @@ public class BookServiceTest {
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
-        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(bookDTO)));
     }
 
     @Test
@@ -142,7 +140,7 @@ public class BookServiceTest {
         assertThat(pageDTO.getTotalPages(), is(equalTo(1)));
         assertThat(pageDTO.getSize(), is(equalTo(1)));
         assertThat(pageDTO.getTotalElements(), is(equalTo(1L)));
-        assertThat(pageDTO.getContent().get(0), is(equalTo(givenBook)));
+        assertThat(pageDTO.getContent().get(0), is(equalTo(bookDTO)));
     }
 
     @Test
@@ -156,67 +154,67 @@ public class BookServiceTest {
     @Test
     @DisplayName("Should save a new Book")
     void whenANewBookIsGivenThenItShouldBeSaved() {
-        when(bookRepository.findByIsbn(expectedBook.getIsbn())).thenReturn(Optional.empty());
-        when(bookRepository.save(expectedBook)).thenReturn(expectedBook);
-        bookDTO = bookService.save(givenBook);
-        assertThat(bookDTO.getId(), is(equalTo(expectedBook.getId())));
-        assertThat(bookDTO.getIsbn(), is(equalTo(expectedBook.getIsbn())));
-        assertThat(bookDTO.getTitle(), is(equalTo(expectedBook.getTitle())));
-        assertThat(bookDTO.getPrintLength(), is(equalTo(expectedBook.getPrintLength())));
-        assertThat(bookDTO.getLanguage(), is(equalTo(expectedBook.getLanguage())));
-        assertThat(bookDTO.getPublicationYear(), is(equalTo(expectedBook.getPublicationYear())));
-        assertThat(bookDTO.getPublisher(), is(equalTo(expectedBook.getPublisher())));
-        assertThat(bookDTO.getUrlCover(), is(equalTo(expectedBook.getUrlCover())));
-        assertThat(bookDTO.getBookGenre(), is(equalTo(expectedBook.getBookGenre())));
-        assertThat(bookDTO.getAuthors(), is(equalTo(expectedBook.getAuthors())));
+        when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.save(book)).thenReturn(book);
+        bookDTO = bookService.save(bookDTO);
+        assertThat(bookDTO.getId(), is(equalTo(book.getId())));
+        assertThat(bookDTO.getIsbn(), is(equalTo(book.getIsbn())));
+        assertThat(bookDTO.getTitle(), is(equalTo(book.getTitle())));
+        assertThat(bookDTO.getPrintLength(), is(equalTo(book.getPrintLength())));
+        assertThat(bookDTO.getLanguage(), is(equalTo(book.getLanguage())));
+        assertThat(bookDTO.getPublicationYear(), is(equalTo(book.getPublicationYear())));
+        assertThat(bookDTO.getPublisher(), is(equalTo(book.getPublisher())));
+        assertThat(bookDTO.getUrlCover(), is(equalTo(book.getUrlCover())));
+        assertThat(bookDTO.getBookGenre(), is(equalTo(book.getBookGenre())));
+        assertThat(bookDTO.getAuthors(), is(equalTo(book.getAuthors())));
     }
 
     @Test
     @DisplayName("Should throw a BookAlreadyRegisteredException exception")
     void whenISBNAlreadyRegisteredIsGivenToSaveANewBookThenThrowAnException() {
-        when(bookRepository.findByIsbn(expectedBook.getIsbn())).thenReturn(Optional.of(expectedBook));
-        assertThrows(BookAlreadyRegisteredException.class, () -> bookService.save(givenBook));
+        when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.of(book));
+        assertThrows(BookAlreadyRegisteredException.class, () -> bookService.save(bookDTO));
     }
 
     @Test
     @DisplayName("Should update data book by its id")
     void whenARegisteredIdIsGivenToUpdateDataBookThenItShouldBeUpdated() {
-        when(bookRepository.getById(expectedBook.getId())).thenReturn(expectedBook);
-        when(bookRepository.save(expectedBook)).thenReturn(expectedBook);
-        bookDTO = bookService.updateById(givenBook);
-        assertThat(bookDTO.getId(), is(equalTo(expectedBook.getId())));
-        assertThat(bookDTO.getIsbn(), is(equalTo(expectedBook.getIsbn())));
-        assertThat(bookDTO.getTitle(), is(equalTo(expectedBook.getTitle())));
-        assertThat(bookDTO.getPrintLength(), is(equalTo(expectedBook.getPrintLength())));
-        assertThat(bookDTO.getLanguage(), is(equalTo(expectedBook.getLanguage())));
-        assertThat(bookDTO.getPublicationYear(), is(equalTo(expectedBook.getPublicationYear())));
-        assertThat(bookDTO.getPublisher(), is(equalTo(expectedBook.getPublisher())));
-        assertThat(bookDTO.getUrlCover(), is(equalTo(expectedBook.getUrlCover())));
-        assertThat(bookDTO.getBookGenre(), is(equalTo(expectedBook.getBookGenre())));
-        assertThat(bookDTO.getAuthors(), is(equalTo(expectedBook.getAuthors())));
+        when(bookRepository.getById(book.getId())).thenReturn(book);
+        when(bookRepository.save(book)).thenReturn(book);
+        bookDTO = bookService.update(bookDTO);
+        assertThat(bookDTO.getId(), is(equalTo(book.getId())));
+        assertThat(bookDTO.getIsbn(), is(equalTo(book.getIsbn())));
+        assertThat(bookDTO.getTitle(), is(equalTo(book.getTitle())));
+        assertThat(bookDTO.getPrintLength(), is(equalTo(book.getPrintLength())));
+        assertThat(bookDTO.getLanguage(), is(equalTo(book.getLanguage())));
+        assertThat(bookDTO.getPublicationYear(), is(equalTo(book.getPublicationYear())));
+        assertThat(bookDTO.getPublisher(), is(equalTo(book.getPublisher())));
+        assertThat(bookDTO.getUrlCover(), is(equalTo(book.getUrlCover())));
+        assertThat(bookDTO.getBookGenre(), is(equalTo(book.getBookGenre())));
+        assertThat(bookDTO.getAuthors(), is(equalTo(book.getAuthors())));
     }
 
     @Test
     @DisplayName("Should throw a BookNotFoundException exception when an unregistered id is supplied")
     void whenAnUnregisteredIdIsGivenToUpdateDataBookThenThrowAnException() {
-        when(bookRepository.getById(expectedBook.getId())).thenReturn(null);
-        assertThrows(BookNotFoundException.class, () -> bookService.updateById(givenBook));
+        when(bookRepository.getById(book.getId())).thenReturn(null);
+        assertThrows(BookNotFoundException.class, () -> bookService.update(bookDTO));
     }
 
     @Test
     @DisplayName("Should delete a book when a registered id is supplied")
     void whenARegisteredBookIdIsGivenThenABookShouldBeDeleted() {
-        when(bookRepository.getById(expectedBook.getId())).thenReturn(expectedBook);
-        doNothing().when(bookRepository).deleteById(expectedBook.getId());
-        bookService.deleteById(givenBook.getId());
-        verify(bookRepository, times(1)).getById(expectedBook.getId());
-        verify(bookRepository, times(1)).deleteById(expectedBook.getId());
+        when(bookRepository.getById(book.getId())).thenReturn(book);
+        doNothing().when(bookRepository).deleteById(book.getId());
+        bookService.deleteById(bookDTO.getId());
+        verify(bookRepository, times(1)).getById(book.getId());
+        verify(bookRepository, times(1)).deleteById(book.getId());
     }
 
     @Test
     @DisplayName("Should throw a BookNotFoundException exception when an unregistered id is supplied")
     void whenAnUnregisteredBookIdIsGivenThenThrowAnException() {
-        when(bookRepository.getById(expectedBook.getId())).thenReturn(null);
-        assertThrows(BookNotFoundException.class, () -> bookService.deleteById(givenBook.getId()));
+        when(bookRepository.getById(book.getId())).thenReturn(null);
+        assertThrows(BookNotFoundException.class, () -> bookService.deleteById(bookDTO.getId()));
     }
 }

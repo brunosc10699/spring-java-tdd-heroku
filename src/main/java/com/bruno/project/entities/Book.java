@@ -1,6 +1,5 @@
 package com.bruno.project.entities;
 
-import com.bruno.project.dto.BookDTO;
 import com.bruno.project.enums.BookGenre;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,17 +65,5 @@ public class Book implements Serializable {
         this.urlCover = urlCover;
         this.synopsis = synopsis;
         this.bookGenre = bookGenre;
-    }
-
-    public Book(BookDTO bookDTO) {
-        id = bookDTO.getId();
-        isbn = bookDTO.getIsbn();
-        title = bookDTO.getTitle();
-        printLength = bookDTO.getPrintLength();
-        language = bookDTO.getLanguage();
-        publicationYear = bookDTO.getPublicationYear();
-        publisher = bookDTO.getPublisher();
-        urlCover = bookDTO.getUrlCover();
-        bookGenre = bookDTO.getBookGenre();
     }
 }

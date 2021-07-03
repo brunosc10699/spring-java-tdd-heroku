@@ -2,7 +2,6 @@ package com.bruno.project.dto;
 
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.ISBN;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class BookDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -47,8 +45,22 @@ public class BookDTO implements Serializable {
 
     private BookGenre bookGenre;
 
-    @NotEmpty(message = "You must enter at least one author name!")
+    @NotEmpty(message = "You must enter one author name at least!")
     private List<AuthorDTO> authors = new ArrayList<>();
+
+    public BookDTO(Long id, String isbn, String title, Integer printLength, String language, String publicationYear, String publisher, String urlCover, String synopsis, BookGenre bookGenre, List<AuthorDTO> authors) {
+        this.id = id;
+        this.isbn = isbn;
+        this.title = title;
+        this.printLength = printLength;
+        this.language = language;
+        this.publicationYear = publicationYear;
+        this.publisher = publisher;
+        this.urlCover = urlCover;
+        this.synopsis = synopsis;
+        this.bookGenre = bookGenre;
+        this.authors = authors;
+    }
 
     public BookDTO(Book book){
         id = book.getId();

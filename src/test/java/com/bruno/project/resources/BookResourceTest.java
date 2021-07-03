@@ -1,7 +1,7 @@
 package com.bruno.project.resources;
 
+import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.dto.BookDTO;
-import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import com.bruno.project.resource.BookResource;
@@ -25,8 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 import static com.bruno.project.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
@@ -38,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class BookResourceTest {
 
-    private Author author = new Author(
+    private AuthorDTO author = new AuthorDTO (
             1l,
             "Jo Nesbø",
             LocalDate.parse("1960-03-29"),
@@ -47,8 +45,6 @@ public class BookResourceTest {
             "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
             null
     );
-
-    private List<Author> authors = Arrays.asList(author);
 
     private Book givenBook = new Book(
             1L,
@@ -126,6 +122,7 @@ public class BookResourceTest {
     @Test
     @DisplayName("Should return 201 created status")
     void whenPOSTIsCalledThenReturnCreatedStatus() throws Exception {
+        expectedBook.getAuthors().add(author);
         when(bookService.save(expectedBook)).thenReturn(expectedBook);
         mockMvc.perform(post(URL)
         .contentType(MediaType.APPLICATION_JSON)
@@ -144,7 +141,8 @@ public class BookResourceTest {
     @Test
     @DisplayName("Must throw a BookAlreadyRegisteredException exception when a registered ISBN is provided")
     void whenPOSTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
-        when(bookService.save(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
+        expectedBook.getAuthors().add(author);
+        doThrow(BookAlreadyRegisteredException.class).when(bookService).save(expectedBook);
         mockMvc.perform(post(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
@@ -154,7 +152,8 @@ public class BookResourceTest {
     @Test
     @DisplayName("Must return 200 Ok status when updating book data")
     void whenPUTIsCalledToUpdateBookDataThenReturnOkStatus() throws Exception {
-        when(bookService.updateById(expectedBook)).thenReturn(expectedBook);
+        expectedBook.getAuthors().add(author);
+        when(bookService.update(expectedBook)).thenReturn(expectedBook);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
@@ -172,7 +171,8 @@ public class BookResourceTest {
     @Test
     @DisplayName("Must throw a BookNotFoundException exception when trying to update a book with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
-        when(bookService.updateById(expectedBook)).thenThrow(BookNotFoundException.class);
+        expectedBook.getAuthors().add(author);
+        when(bookService.update(expectedBook)).thenThrow(BookNotFoundException.class);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
@@ -183,7 +183,8 @@ public class BookResourceTest {
     @DisplayName("Must throw a BookAlreadyRegisteredException exception " +
             "when trying to update a book with a registered ISBN")
     void whenPUTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
-        when(bookService.updateById(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
+        expectedBook.getAuthors().add(author);
+        when(bookService.update(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
