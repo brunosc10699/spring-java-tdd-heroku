@@ -45,6 +45,13 @@ public class BookResource {
         return ResponseEntity.ok(bookService.findByPublisherContainingIgnoreCase(publisher, pageable));
     }
 
+    @GetMapping(value = "/author")
+    public ResponseEntity<Page<BookDTO>> findBooksByAuthorName(
+            @RequestParam(value = "text", defaultValue = "") String author, Pageable pageable
+    ){
+        return ResponseEntity.ok(bookService.findBooksByAuthorName(author, pageable));
+    }
+
     @PostMapping
     public ResponseEntity<BookDTO> save(@Valid @RequestBody BookDTO bookDTO){
         bookDTO = bookService.save(bookDTO);
