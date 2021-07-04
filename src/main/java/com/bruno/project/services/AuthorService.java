@@ -29,7 +29,7 @@ public class AuthorService {
     }
 
     public AuthorDTO save(AuthorDTO authorDTO) {
-        checkRegisteredEmail(authorDTO.getEmail());
+        checkRegisteredEmail(authorDTO.getId(), authorDTO.getEmail());
         authorDTO.setId(null);
         if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
         Author author = fromDTO(authorDTO);
@@ -37,7 +37,7 @@ public class AuthorService {
     }
 
     public AuthorDTO update(AuthorDTO authorDTO) {
-        checkRegisteredEmail(authorDTO.getEmail());
+        checkRegisteredEmail(authorDTO.getId(), authorDTO.getEmail());
         checkRegisteredId(authorDTO.getId());
         Author author = fromDTO(authorDTO);
         return new AuthorDTO(authorRepository.save(author));
@@ -65,8 +65,8 @@ public class AuthorService {
         return true;
     }
 
-    private void checkRegisteredEmail(String email){
+    private void checkRegisteredEmail(Long id, String email){
         Optional<Author> author = authorRepository.findByEmailIgnoreCase(email);
-        if(author.isPresent()) throw new AuthorEmailAlreadyRegisteredException(email);
+        if(author.isPresent() && author.get().getId() != id) throw new AuthorEmailAlreadyRegisteredException(email);
     }
 }
