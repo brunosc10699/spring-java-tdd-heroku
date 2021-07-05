@@ -37,7 +37,9 @@ public class AuthorService {
 
     public AuthorDTO updateById(Long id, AuthorDTO authorDTO) {
         checkGivenId(id);
-        checkRegisteredEmail(authorDTO.getId(), authorDTO.getEmail());
+        checkRegisteredEmail(id, authorDTO.getEmail());
+        if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
+        authorDTO.setId(id);
         Author author = fromDTO(authorDTO);
         return new AuthorDTO(authorRepository.save(author));
     }

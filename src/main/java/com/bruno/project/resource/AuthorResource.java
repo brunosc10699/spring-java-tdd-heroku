@@ -44,7 +44,12 @@ public class AuthorResource {
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<AuthorDTO> updateById(@PathVariable Long id, @Valid @RequestBody AuthorDTO authorDTO){
-        return ResponseEntity.ok(authorService.updateById(id, authorDTO));
+        try {
+            authorDTO = authorService.updateById(id, authorDTO);
+        } catch (Exception e) {
+            throw new AuthorNotFoundException(e.getMessage());
+        }
+        return ResponseEntity.ok(authorDTO);
     }
 
     @DeleteMapping(value = "/{id}")
