@@ -5,6 +5,7 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import com.bruno.project.repositories.BookRepository;
+import com.bruno.project.resource.BookResource;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -71,6 +72,9 @@ public class BookServiceTest {
 
     @InjectMocks
     private BookService bookService;
+
+    @InjectMocks
+    private BookResource bookResource;
 
     @Test
     @DisplayName("Should return a Page of Books")
@@ -193,15 +197,16 @@ public class BookServiceTest {
     @DisplayName("Should throw a BookAlreadyRegisteredException exception")
     void whenISBNAlreadyRegisteredIsGivenToSaveANewBookThenThrowAnException() {
         when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.of(book));
+        book.setId(1L);
         assertThrows(BookAlreadyRegisteredException.class, () -> bookService.save(bookDTO));
     }
 
     @Test
-    @DisplayName("Should update data book by its id")
-    void whenARegisteredIdIsGivenToUpdateDataBookThenItShouldBeUpdated() {
+    @DisplayName("Should updateById data book by its id")
+    void whenARegisteredIdIsGivenToUpdateByIdDataBookThenItShouldBeUpdateByIdd() {
         when(bookRepository.getById(book.getId())).thenReturn(book);
         when(bookRepository.save(book)).thenReturn(book);
-        bookDTO = bookService.update(bookDTO);
+        bookDTO = bookService.updateById(bookDTO.getId(), bookDTO);
         assertThat(bookDTO.getId(), is(equalTo(book.getId())));
         assertThat(bookDTO.getIsbn(), is(equalTo(book.getIsbn())));
         assertThat(bookDTO.getTitle(), is(equalTo(book.getTitle())));
@@ -216,9 +221,10 @@ public class BookServiceTest {
 
     @Test
     @DisplayName("Should throw a BookNotFoundException exception when an unregistered id is supplied")
-    void whenAnUnregisteredIdIsGivenToUpdateDataBookThenThrowAnException() {
+    void whenAnUnregisteredIdIsGivenToUpdateByIdBookDataThenThrowAnException() {
         when(bookRepository.getById(book.getId())).thenReturn(null);
-        assertThrows(BookNotFoundException.class, () -> bookService.update(bookDTO));
+        bookService.deleteById(bookDTO.getId());
+        assertThrows(BookNotFoundException.class, () -> bookResource.updateById(bookDTO.getId(), bookDTO));
     }
 
     @Test
@@ -232,9 +238,10 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw a BookNotFoundException exception when an unregistered id is supplied")
-    void whenAnUnregisteredBookIdIsGivenThenThrowAnException() {
+    @DisplayName("Should throw a BookNotFoundException exception when trying to delete a Book with an unregistered id")
+    void whenAnUnregisteredBookIdIsGivenToDeleteABookThenThrowAnException() {
         when(bookRepository.getById(book.getId())).thenReturn(null);
-        assertThrows(BookNotFoundException.class, () -> bookService.deleteById(bookDTO.getId()));
+        bookService.deleteById(bookDTO.getId());
+        assertThrows(BookNotFoundException.class, () -> bookResource.deleteById(bookDTO.getId()));
     }
 }

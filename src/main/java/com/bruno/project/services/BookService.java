@@ -60,9 +60,10 @@ public class BookService {
     }
 
     public BookDTO updateById(Long id, BookDTO bookDTO){
-        checkRegisteredISBN(id, bookDTO.getIsbn());
         checkGivenId(id);
+        checkRegisteredISBN(id, bookDTO.getIsbn());
         List<Author> listAuthor = checkRegisteredAuthors(bookDTO.getAuthors());
+        if(bookDTO.getUrlCover() == null) bookDTO.setUrlCover("51264896706_e66beed079_n.jpg");
         bookDTO.setId(id);
         Book book = fromDTO(bookDTO);
         book.getAuthors().addAll(listAuthor);
@@ -117,12 +118,15 @@ public class BookService {
         return listAuthor;
     }
 
-    private void checkGivenId(Long id){
-        bookRepository.getById(id);
+    private Book checkGivenId(Long id){
+        Book book = bookRepository.getById(id);
+        return book;
     }
 
-    private void checkRegisteredISBN(Long id, String isbn){
+    private Optional<Book> checkRegisteredISBN(Long id, String isbn){
         Optional<Book> book = bookRepository.findByIsbn(isbn);
-        if(book.isPresent() && book.get().getId() != id) throw new BookAlreadyRegisteredException(isbn);
+        if(book.isPresent() && book.get().getId() != id)
+            throw new BookAlreadyRegisteredException(isbn);
+        return book;
     }
 }

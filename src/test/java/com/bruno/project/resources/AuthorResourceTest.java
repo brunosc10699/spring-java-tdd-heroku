@@ -116,8 +116,8 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("Must return 200 Ok status when updating author data")
     void whenPUTIsCalledThenReturnOkStatus() throws Exception {
-        when(authorService.update(givenAuthor)).thenReturn(givenAuthor);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        when(authorService.updateById(givenAuthor.getId(), givenAuthor)).thenReturn(givenAuthor);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + givenAuthor.getId())
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(givenAuthor)))
                 .andExpect(status().isOk())
@@ -129,20 +129,20 @@ public class AuthorResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw 400 BadRequest status when trying to update author data with an already registered email")
+    @DisplayName("Must throw 400 BadRequest status when trying to updateById author data with an already registered email")
     void whenPUTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
-        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).update(givenAuthor);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Must throw 404 NotFound status when trying to update author data with an unregistered id")
+    @DisplayName("Must throw 404 NotFound status when trying to updateById author data with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
-        doThrow(AuthorNotFoundException.class).when(authorService).update(givenAuthor);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        doThrow(AuthorNotFoundException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isNotFound());

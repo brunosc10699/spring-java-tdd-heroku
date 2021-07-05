@@ -2,6 +2,7 @@ package com.bruno.project.resource;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.services.AuthorService;
+import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,11 @@ public class AuthorResource {
 
     @PostMapping
     public ResponseEntity<AuthorDTO> save(@Valid @RequestBody AuthorDTO authorDTO){
-        authorDTO = authorService.save(authorDTO);
+        try {
+            authorDTO = authorService.save(authorDTO);
+        } catch (Exception e) {
+            throw new AuthorEmailAlreadyRegisteredException(e.getMessage());
+        }
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(authorDTO)
@@ -46,6 +51,10 @@ public class AuthorResource {
     public ResponseEntity<AuthorDTO> updateById(@PathVariable Long id, @Valid @RequestBody AuthorDTO authorDTO){
         try {
             authorDTO = authorService.updateById(id, authorDTO);
+        } catch (AuthorEmailAlreadyRegisteredException e) {
+            throw new AuthorEmailAlreadyRegisteredException(e.getMessage());
+        } catch (AuthorNotFoundException e) {
+            throw new AuthorNotFoundException(e.getMessage());
         } catch (Exception e) {
             throw new AuthorNotFoundException(e.getMessage());
         }

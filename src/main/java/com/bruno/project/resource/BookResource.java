@@ -2,6 +2,7 @@ package com.bruno.project.resource;
 
 import com.bruno.project.dto.BookDTO;
 import com.bruno.project.services.BookService;
+import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,8 +66,15 @@ public class BookResource {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<BookDTO> update(@PathVariable Long id, @Valid @RequestBody BookDTO bookDTO){
-        return ResponseEntity.ok(bookService.updateById(id, bookDTO));
+    public ResponseEntity<BookDTO> updateById(@PathVariable Long id, @Valid @RequestBody BookDTO bookDTO){
+        try {
+            bookDTO = bookService.updateById(id, bookDTO);
+        } catch (BookAlreadyRegisteredException e) {
+            throw new BookAlreadyRegisteredException(e.getMessage());
+        } catch (Exception e) {
+            throw new BookNotFoundException(e.getMessage());
+        }
+        return ResponseEntity.ok(bookDTO);
     }
 
     @DeleteMapping(value = "/{id}")

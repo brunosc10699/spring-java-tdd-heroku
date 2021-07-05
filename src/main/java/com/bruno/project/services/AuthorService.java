@@ -4,12 +4,14 @@ import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -36,7 +38,11 @@ public class AuthorService {
     }
 
     public AuthorDTO updateById(Long id, AuthorDTO authorDTO) {
-        checkGivenId(id);
+        try {
+            checkGivenId(id);
+        } catch (EntityNotFoundException e) {
+            throw new AuthorNotFoundException(e.getMessage());
+        }
         checkRegisteredEmail(id, authorDTO.getEmail());
         if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
         authorDTO.setId(id);
@@ -61,12 +67,16 @@ public class AuthorService {
         );
     }
 
-    private void checkGivenId(Long id) {
-        authorRepository.getById(id);
+    private Author checkGivenId(Long id) {
+        Author author = authorRepository.getById(id);
+        return author;
     }
 
-    private void checkRegisteredEmail(Long id, String email){
+    private Optional<Author> checkRegisteredEmail(Long id, String email){
         Optional<Author> author = authorRepository.findByEmailIgnoreCase(email);
-        if(author.isPresent() && author.get().getId() != id) throw new AuthorEmailAlreadyRegisteredException(email);
+        if(author.isPresent() && author.get().getId() != id)
+            throw new AuthorEmailAlreadyRegisteredException("The email " + email
+                    + " you supplied is already registered! Try with another one.");
+        return author;
     }
 }

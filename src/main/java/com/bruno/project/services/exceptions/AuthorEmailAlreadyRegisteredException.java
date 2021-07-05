@@ -8,7 +8,7 @@ public class AuthorEmailAlreadyRegisteredException extends RuntimeException{
 
     private static final long serialVersionUID = 1L;
 
-    public AuthorEmailAlreadyRegisteredException(String email){
-        super("The email " + email + " you supplied is already registered! Try with another one.");
+    public AuthorEmailAlreadyRegisteredException(String message){
+        super(message);
     }
 }

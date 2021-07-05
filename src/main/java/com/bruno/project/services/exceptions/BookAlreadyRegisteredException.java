@@ -9,6 +9,6 @@ public class BookAlreadyRegisteredException extends RuntimeException{
     private static final long serialVersionUID = 1L;
 
     public BookAlreadyRegisteredException(String message){
-        super("The ISBN's " + message + " book you are trying to register, is already registered!");
+        super("The books ISBN " + message + " that you are trying to register, is already registered!");
     }
 }

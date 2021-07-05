@@ -164,10 +164,10 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Must return 200 Ok status when updating book data")
-    void whenPUTIsCalledToUpdateBookDataThenReturnOkStatus() throws Exception {
+    void whenPUTIsCalledToUpdateByIdBookDataThenReturnOkStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
-        when(bookService.update(expectedBook)).thenReturn(expectedBook);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        when(bookService.updateById(expectedBook.getId(), expectedBook)).thenReturn(expectedBook);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isOk())
@@ -182,11 +182,11 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw a BookNotFoundException exception when trying to update a book with an unregistered id")
+    @DisplayName("Must throw a BookNotFoundException exception when trying to updateById a book with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
-        when(bookService.update(expectedBook)).thenThrow(BookNotFoundException.class);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        when(bookService.updateById(expectedBook.getId(), expectedBook)).thenThrow(BookNotFoundException.class);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isNotFound());
@@ -194,11 +194,11 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Must throw a BookAlreadyRegisteredException exception " +
-            "when trying to update a book with a registered ISBN")
+            "when trying to updateById a book with a registered ISBN")
     void whenPUTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
-        when(bookService.update(expectedBook)).thenThrow(BookAlreadyRegisteredException.class);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        doThrow(BookAlreadyRegisteredException.class).when(bookService).updateById(expectedBook.getId(), expectedBook);
+        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isBadRequest());
