@@ -63,9 +63,9 @@ public class BookResource {
         return ResponseEntity.created(uri).body(bookDTO);
     }
 
-    @PutMapping
-    public ResponseEntity<BookDTO> update(@Valid @RequestBody BookDTO bookDTO){
-        return ResponseEntity.ok(bookService.update(bookDTO));
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<BookDTO> update(@PathVariable Long id, @Valid @RequestBody BookDTO bookDTO){
+        return ResponseEntity.ok(bookService.updateById(id, bookDTO));
     }
 
     @DeleteMapping(value = "/{id}")
