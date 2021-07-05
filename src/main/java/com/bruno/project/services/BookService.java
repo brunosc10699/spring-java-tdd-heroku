@@ -8,7 +8,6 @@ import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +61,7 @@ public class BookService {
 
     public BookDTO updateById(Long id, BookDTO bookDTO){
         checkRegisteredISBN(id, bookDTO.getIsbn());
-        checkRegisteredId(id);
+        checkGivenId(id);
         List<Author> listAuthor = checkRegisteredAuthors(bookDTO.getAuthors());
         bookDTO.setId(id);
         Book book = fromDTO(bookDTO);
@@ -71,7 +70,8 @@ public class BookService {
     }
 
     public void deleteById(Long id){
-        if(checkRegisteredId(id)) bookRepository.deleteById(id);
+        checkGivenId(id);
+        bookRepository.deleteById(id);
     }
 
     private List<Author> fromListDTO(List<AuthorDTO> authorDTOList){
@@ -117,10 +117,8 @@ public class BookService {
         return listAuthor;
     }
 
-    private Boolean checkRegisteredId(Long id){
-        Book book = bookRepository.getById(id);
-        if(book == null) throw new BookNotFoundException(id);
-        return true;
+    private void checkGivenId(Long id){
+        bookRepository.getById(id);
     }
 
     private void checkRegisteredISBN(Long id, String isbn){

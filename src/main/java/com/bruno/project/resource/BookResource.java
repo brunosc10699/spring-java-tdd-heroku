@@ -2,6 +2,7 @@ package com.bruno.project.resource;
 
 import com.bruno.project.dto.BookDTO;
 import com.bruno.project.services.BookService;
+import com.bruno.project.services.exceptions.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,7 +71,11 @@ public class BookResource {
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
-        bookService.deleteById(id);
+        try {
+            bookService.deleteById(id);
+        } catch (Exception e) {
+            throw new BookNotFoundException(e.getMessage());
+        }
         return ResponseEntity.noContent().build();
     }
 }
