@@ -2,6 +2,7 @@ package com.bruno.project.resource;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.services.AuthorService;
+import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,14 +42,18 @@ public class AuthorResource {
         return ResponseEntity.created(uri).body(authorDTO);
     }
 
-    @PutMapping
-    public ResponseEntity<AuthorDTO> update(@Valid @RequestBody AuthorDTO authorDTO){
-        return ResponseEntity.ok(authorService.update(authorDTO));
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<AuthorDTO> updateById(@PathVariable Long id, @Valid @RequestBody AuthorDTO authorDTO){
+        return ResponseEntity.ok(authorService.updateById(id, authorDTO));
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
-        authorService.deleteById(id);
+        try {
+            authorService.deleteById(id);
+        } catch (Exception e) {
+            throw new AuthorNotFoundException(e.getMessage());
+        }
         return ResponseEntity.noContent().build();
     }
 }
