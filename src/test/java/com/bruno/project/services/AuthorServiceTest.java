@@ -3,7 +3,7 @@ package com.bruno.project.services;
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.repositories.AuthorRepository;
-import com.bruno.project.resource.AuthorResource;
+import com.bruno.project.resources.AuthorResource;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import org.junit.jupiter.api.DisplayName;

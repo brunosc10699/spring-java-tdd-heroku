@@ -1,4 +1,4 @@
-package com.bruno.project.resource;
+package com.bruno.project.resources;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.services.AuthorService;

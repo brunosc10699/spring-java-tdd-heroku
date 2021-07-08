@@ -5,7 +5,6 @@ import com.bruno.project.dto.BookDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
-import com.bruno.project.resource.BookResource;
 import com.bruno.project.services.BookService;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;

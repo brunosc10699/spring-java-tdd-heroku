@@ -1,4 +1,4 @@
-package com.bruno.project.resource;
+package com.bruno.project.resources;
 
 import com.bruno.project.dto.BookDTO;
 import com.bruno.project.services.BookService;

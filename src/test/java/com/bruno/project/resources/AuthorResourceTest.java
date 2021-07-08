@@ -2,7 +2,6 @@ package com.bruno.project.resources;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
-import com.bruno.project.resource.AuthorResource;
 import com.bruno.project.services.AuthorService;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
