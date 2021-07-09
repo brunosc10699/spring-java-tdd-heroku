@@ -12,6 +12,10 @@ Build a simple Rest API to manage books applying TDD (Test Driven Development) a
 
 It may take some time to open because it is hosted for free on Heroku.
 
+#### The API status is monitored by the Spring Actuator.
+
+#### https://bruno-books-management.herokuapp.com/actuator/health
+
 #### Stack
 
 ![alt-text-1](https://live.staticflickr.com/65535/51300833708_75a800768f_n.jpg "Java")![alt-text-2](https://live.staticflickr.com/65535/51300994079_471d0a2a75_n.jpg "Spring")![alt-text-3](https://live.staticflickr.com/65535/51300994179_a899b218f0_n.jpg "Heroku")![alt-text-4](https://live.staticflickr.com/65535/51299906262_98e489b59a_n.jpg "Github")![alt-text-5](https://live.staticflickr.com/65535/51301301835_3b614ef1dc_n.jpg "Git")![alt-text-6](https://live.staticflickr.com/65535/51300286091_47feff87ed_n.jpg "PostgreSQL")![alt-text-7](https://live.staticflickr.com/65535/51300649436_ca50fd6815_n.jpg "H2")![alt-text-8](https://live.staticflickr.com/65535/51301663380_cb6be126b4_n.jpg "Project Lombok")![alt-text-9](https://live.staticflickr.com/65535/51300994044_39e424118d_n.jpg "Swagger")![alt-text-10](https://live.staticflickr.com/65535/51301360574_d5ff7350f7_n.jpg "JUnit")![alt-text-11](https://live.staticflickr.com/65535/51301140479_382d485de8_n.jpg "Mockito")![alt-text-12](https://live.staticflickr.com/65535/51299906232_f06df32fee_n.jpg "Hamcrest")![alt-text-13](https://live.staticflickr.com/65535/51300681046_fda4dfa22b_n.jpg "IntelliJ IDEA")![alt-text-14](https://live.staticflickr.com/65535/51300681056_8aac67b995_n.jpg "Gradle")![alt-text-15](https://live.staticflickr.com/65535/51299937717_7bd7171088_n.jpg "Postman")
