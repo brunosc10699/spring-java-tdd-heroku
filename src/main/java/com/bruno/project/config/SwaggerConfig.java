@@ -60,7 +60,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 "Version 1.0",
                 null,
                 new Contact("Bruno", "https://github.com/brunosc10699", "brunosc10699@gmail.com"),
-                "This API is allowed only for studies!",
+                "This API is only allowed for studies",
                 null,
                 Collections.emptyList()
         );
