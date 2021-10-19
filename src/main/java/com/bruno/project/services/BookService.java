@@ -8,6 +8,7 @@ import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +20,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
-    @Autowired
-    private AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
 
     @Transactional(readOnly = true)
     public Page<BookDTO> findAll(Pageable pageable) {

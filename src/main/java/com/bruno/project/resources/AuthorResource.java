@@ -7,6 +7,7 @@ import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +20,10 @@ import java.net.URI;
 
 @RestController
 @RequestMapping(value = "/api/v1/authors")
+@RequiredArgsConstructor
 public class AuthorResource {
 
-    @Autowired
-    private AuthorService authorService;
+    private final AuthorService authorService;
 
     @ApiOperation(value = "Returns a page with all registered authors")
     @GetMapping
