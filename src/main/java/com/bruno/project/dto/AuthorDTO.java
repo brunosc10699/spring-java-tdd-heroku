@@ -2,8 +2,7 @@ package com.bruno.project.dto;
 
 import com.bruno.project.entities.Author;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -13,8 +12,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class AuthorDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,17 +39,8 @@ public class AuthorDTO implements Serializable {
 
     private String urlPicture;
 
+    @Builder.Default
     private List<BookDTO> books = new ArrayList<>();
-
-    public AuthorDTO(Long id, String name, LocalDate birthDate, String email, String phone, String biography, String urlPicture) {
-        this.id = id;
-        this.name = name;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.phone = phone;
-        this.biography = biography;
-        this.urlPicture = urlPicture;
-    }
 
     public AuthorDTO(Author author){
         id = author.getId();

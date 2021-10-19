@@ -1,8 +1,7 @@
 package com.bruno.project.entities;
 
 import com.bruno.project.enums.BookGenre;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +12,8 @@ import java.util.List;
 @Table(name = "tb_book")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Book implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -21,29 +22,38 @@ public class Book implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @EqualsAndHashCode.Exclude
     @Column(nullable = false, unique = true)
     private String isbn;
 
+    @EqualsAndHashCode.Exclude
     @Column(nullable = false)
     private String title;
 
+    @EqualsAndHashCode.Exclude
     @Column(nullable = false)
     private Integer printLength;
 
+    @EqualsAndHashCode.Exclude
     @Column(nullable = false)
     private String language;
 
+    @EqualsAndHashCode.Exclude
     @Column(nullable = false)
     private String publicationYear;
 
+    @EqualsAndHashCode.Exclude
     private String publisher;
 
+    @EqualsAndHashCode.Exclude
     private String urlCover;
 
+    @EqualsAndHashCode.Exclude
     @Lob @Basic(fetch = FetchType.LAZY)
     @Column(length = 1000)
     private String synopsis;
 
+    @EqualsAndHashCode.Exclude
     private BookGenre bookGenre;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -51,19 +61,10 @@ public class Book implements Serializable {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
+
+    @Builder.Default
+    @EqualsAndHashCode.Exclude
     @Column(nullable = false)
     private List<Author> authors = new ArrayList<>();
 
-    public Book(Long id, String isbn, String title, Integer printLength, String language, String publicationYear, String publisher, String urlCover, String synopsis, BookGenre bookGenre) {
-        this.id = id;
-        this.isbn = isbn;
-        this.title = title;
-        this.printLength = printLength;
-        this.language = language;
-        this.publicationYear = publicationYear;
-        this.publisher = publisher;
-        this.urlCover = urlCover;
-        this.synopsis = synopsis;
-        this.bookGenre = bookGenre;
-    }
 }

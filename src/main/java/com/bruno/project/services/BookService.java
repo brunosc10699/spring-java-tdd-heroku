@@ -9,7 +9,6 @@ import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -75,37 +74,19 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    private List<Author> fromListDTO(List<AuthorDTO> authorDTOList){
-        List<Author> list = new ArrayList<>();
-        for(AuthorDTO authorDTO : authorDTOList){
-            Author author = new Author(
-                    authorDTO.getId(),
-                    authorDTO.getName(),
-                    authorDTO.getBirthDate(),
-                    authorDTO.getEmail(),
-                    authorDTO.getPhone(),
-                    authorDTO.getBiography(),
-                    authorDTO.getUrlPicture()
-            );
-            list.add(author);
-        }
-        return list;
-    }
-
     private Book fromDTO(BookDTO bookDTO) {
-        Book book = new Book(
-                bookDTO.getId(),
-                bookDTO.getIsbn(),
-                bookDTO.getTitle(),
-                bookDTO.getPrintLength(),
-                bookDTO.getLanguage(),
-                bookDTO.getPublicationYear(),
-                bookDTO.getPublisher(),
-                bookDTO.getUrlCover(),
-                bookDTO.getSynopsis(),
-                bookDTO.getBookGenre()
-        );
-        return book;
+        return Book.builder()
+                .id(bookDTO.getId())
+                .isbn(bookDTO.getIsbn())
+                .title(bookDTO.getTitle())
+                .printLength(bookDTO.getPrintLength())
+                .language(bookDTO.getLanguage())
+                .publicationYear(bookDTO.getPublicationYear())
+                .publisher(bookDTO.getPublisher())
+                .urlCover(bookDTO.getUrlCover())
+                .synopsis(bookDTO.getSynopsis())
+                .bookGenre(bookDTO.getBookGenre())
+                .build();
     }
 
     private List<Author> checkRegisteredAuthors(List<AuthorDTO> list) {

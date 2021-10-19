@@ -8,10 +8,6 @@ public class BookNotFoundException extends RuntimeException{
 
     private static final long serialVersionUID = 1L;
 
-    public BookNotFoundException(Long id){
-        super("The id " + id + " was not found!");
-    }
-
     public BookNotFoundException(String message){
         super(message);
     }

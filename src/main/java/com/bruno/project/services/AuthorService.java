@@ -57,15 +57,15 @@ public class AuthorService {
     }
 
     private Author fromDTO(AuthorDTO authorDTO) {
-        return new Author(
-                authorDTO.getId(),
-                authorDTO.getName(),
-                authorDTO.getBirthDate(),
-                authorDTO.getEmail(),
-                authorDTO.getPhone(),
-                authorDTO.getBiography(),
-                authorDTO.getUrlPicture()
-        );
+        return Author.builder()
+                .id(authorDTO.getId())
+                .name(authorDTO.getName())
+                .birthDate(authorDTO.getBirthDate())
+                .email(authorDTO.getEmail())
+                .phone(authorDTO.getPhone())
+                .biography(authorDTO.getBiography())
+                .urlPicture(authorDTO.getUrlPicture())
+                .build();
     }
 
     private Author checkGivenId(Long id) {

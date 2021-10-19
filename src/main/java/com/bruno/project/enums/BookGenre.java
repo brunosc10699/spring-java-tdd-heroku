@@ -1,5 +1,11 @@
 package com.bruno.project.enums;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum BookGenre {
 
     ACTION(0, "Action"),
@@ -42,27 +48,6 @@ public enum BookGenre {
 
     private int code;
     private String description;
-
-    BookGenre(int code, String description) {
-        this.code = code;
-        this.description = description;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public static BookGenre toEnum(Integer code){
         if(code == null){
