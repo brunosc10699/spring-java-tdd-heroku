@@ -33,7 +33,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             http.headers().frameOptions().disable();
         }
         http.cors().and().csrf().disable();
-        http.authorizeRequests().antMatchers(PUBLIC_MATCHERS).permitAll();
+        if(!Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+            http.authorizeRequests().anyRequest().permitAll();
+        } else {
+            http.authorizeRequests()
+                    .anyRequest()
+                    .authenticated();
+        }
     }
 
     @Bean
