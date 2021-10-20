@@ -4,6 +4,7 @@ import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.services.AuthorService;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
+import com.bruno.project.services.impl.AuthorServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -23,7 +24,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class AuthorResource {
 
-    private final AuthorService authorService;
+    private final AuthorServiceImpl authorService;
 
     @ApiOperation(value = "Returns a page with all registered authors")
     @GetMapping

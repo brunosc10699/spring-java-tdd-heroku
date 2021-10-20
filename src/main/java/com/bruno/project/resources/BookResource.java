@@ -4,6 +4,7 @@ import com.bruno.project.dto.BookDTO;
 import com.bruno.project.services.BookService;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
+import com.bruno.project.services.impl.BookServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -23,7 +24,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class BookResource {
 
-    private final BookService bookService;
+    private final BookServiceImpl bookService;
 
     @ApiOperation(value = "Returns a page with all registered books and their authors")
     @GetMapping

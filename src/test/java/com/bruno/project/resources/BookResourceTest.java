@@ -8,6 +8,7 @@ import com.bruno.project.enums.BookGenre;
 import com.bruno.project.services.BookService;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
+import com.bruno.project.services.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ public class BookResourceTest {
 
     private AuthorDTO authorDTO = new AuthorDTO(author);
 
-    private Book book = Book.builder()
+    private Book givenBook = Book.builder()
             .isbn("978-0099520320")
             .title("The Bat")
             .printLength(432)
@@ -68,7 +69,7 @@ public class BookResourceTest {
     private MockMvc mockMvc;
 
     @Mock
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
     @InjectMocks
     private BookResource bookResource;
