@@ -5,8 +5,8 @@ import com.bruno.project.dto.BookDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
-import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.BookNotFoundException;
+import com.bruno.project.services.exceptions.ExistingResourceException;
+import com.bruno.project.services.exceptions.ResourceNotFoundException;
 import com.bruno.project.services.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -148,10 +148,10 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("(7) Must throw a BookAlreadyRegisteredException exception when a registered ISBN is provided")
+    @DisplayName("(7) Must throw a ExistingResourceException exception when a registered ISBN is provided")
     void whenPOSTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
-        doThrow(BookAlreadyRegisteredException.class).when(bookService).save(expectedBook);
+        doThrow(ExistingResourceException.class).when(bookService).save(expectedBook);
         mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
@@ -177,10 +177,10 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("(9) Must throw a BookNotFoundException exception when trying to updateById a book with an unregistered id")
+    @DisplayName("(9) Must throw a ResourceNotFoundException exception when trying to updateById a book with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
-        when(bookService.updateById(expectedBook.getId(), expectedBook)).thenThrow(BookNotFoundException.class);
+        when(bookService.updateById(expectedBook.getId(), expectedBook)).thenThrow(ResourceNotFoundException.class);
         mockMvc.perform(MockMvcRequestBuilders.put(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
@@ -188,11 +188,11 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("(10) Must throw a BookAlreadyRegisteredException exception " +
+    @DisplayName("(10) Must throw a ExistingResourceException exception " +
             "when trying to updateById a book with a registered ISBN")
     void whenPUTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
-        doThrow(BookAlreadyRegisteredException.class).when(bookService).updateById(expectedBook.getId(), expectedBook);
+        doThrow(ExistingResourceException.class).when(bookService).updateById(expectedBook.getId(), expectedBook);
         mockMvc.perform(MockMvcRequestBuilders.put(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
@@ -209,9 +209,9 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("(12) Must throw a BookNotFoundException exception when an unregistered id is provided")
+    @DisplayName("(12) Must throw a ResourceNotFoundException exception when an unregistered id is provided")
     void whenDELETEIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
-        doThrow(BookNotFoundException.class).when(bookService).deleteById(expectedBook.getId());
+        doThrow(ResourceNotFoundException.class).when(bookService).deleteById(expectedBook.getId());
         mockMvc.perform(MockMvcRequestBuilders.delete(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());

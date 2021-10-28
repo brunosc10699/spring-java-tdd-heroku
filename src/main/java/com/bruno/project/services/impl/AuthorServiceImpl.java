@@ -4,15 +4,14 @@ import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.services.AuthorService;
-import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.AuthorNotFoundException;
+import com.bruno.project.services.exceptions.ExistingResourceException;
+import com.bruno.project.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -35,7 +34,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorDTO save(AuthorDTO authorDTO) {
-        checkRegisteredEmail(authorDTO.getId(), authorDTO.getEmail());
+        checkRegisteredEmail(null, authorDTO.getEmail());
         authorDTO.setId(null);
         if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
         Author author = fromDTO(authorDTO);
@@ -44,11 +43,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorDTO updateById(Long id, AuthorDTO authorDTO) {
-        try {
-            checkGivenId(id);
-        } catch (EntityNotFoundException e) {
-            throw new AuthorNotFoundException(e.getMessage());
-        }
+        checkGivenId(id);
         checkRegisteredEmail(id, authorDTO.getEmail());
         if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
         authorDTO.setId(id);
@@ -75,15 +70,15 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     private Author checkGivenId(Long id) {
-        Author author = authorRepository.getById(id);
-        return author;
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("The ID '" + id + "' was not found!"));
     }
 
     @Transactional(readOnly = true)
     private Optional<Author> checkRegisteredEmail(Long id, String email){
         Optional<Author> author = authorRepository.findByEmailIgnoreCase(email);
         if(author.isPresent() && author.get().getId() != id)
-            throw new AuthorEmailAlreadyRegisteredException("The email " + email
+            throw new ExistingResourceException("The email " + email
                     + " you supplied is already registered! Try with another one.");
         return author;
     }

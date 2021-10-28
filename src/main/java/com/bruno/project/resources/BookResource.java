@@ -1,8 +1,6 @@
 package com.bruno.project.resources;
 
 import com.bruno.project.dto.BookDTO;
-import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.BookNotFoundException;
 import com.bruno.project.services.impl.BookServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -85,14 +83,7 @@ public class BookResource {
     })
     @PutMapping(value = "/{id}")
     public ResponseEntity<BookDTO> updateById(@PathVariable Long id, @Valid @RequestBody BookDTO bookDTO){
-        try {
-            bookDTO = bookService.updateById(id, bookDTO);
-        } catch (BookAlreadyRegisteredException e) {
-            throw new BookAlreadyRegisteredException(e.getMessage());
-        } catch (Exception e) {
-            throw new BookNotFoundException(e.getMessage());
-        }
-        return ResponseEntity.ok(bookDTO);
+        return ResponseEntity.ok(bookService.updateById(id, bookDTO));
     }
 
     @ApiOperation(value = "Exclude a book")
@@ -101,11 +92,7 @@ public class BookResource {
     })
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
-        try {
-            bookService.deleteById(id);
-        } catch (Exception e) {
-            throw new BookNotFoundException(e.getMessage());
-        }
+        bookService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

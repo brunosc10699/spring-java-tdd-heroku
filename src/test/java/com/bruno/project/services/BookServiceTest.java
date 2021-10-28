@@ -5,9 +5,8 @@ import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
 import com.bruno.project.repositories.BookRepository;
-import com.bruno.project.resources.BookResource;
-import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.BookNotFoundException;
+import com.bruno.project.services.exceptions.ExistingResourceException;
+import com.bruno.project.services.exceptions.ResourceNotFoundException;
 import com.bruno.project.services.impl.BookServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,11 +69,8 @@ public class BookServiceTest {
     @InjectMocks
     private BookServiceImpl bookService;
 
-    @InjectMocks
-    private BookResource bookResource;
-
     @Test
-    @DisplayName("Should return a Page of Books")
+    @DisplayName("(1) Should return a Page of Books")
     void whenFindAllIsCalledThenReturnAPageOfBooks() {
         when(bookRepository.findAll(pageRequest)).thenReturn(page);
         pageDTO = bookService.findAll(pageRequest);
@@ -85,7 +81,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty Page of Books")
+    @DisplayName("(2) Should return an empty Page of Books")
     void whenFindAllIsCalledThenReturnAnEmptyPageOfBooks() {
         when(bookRepository.findAll(pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findAll(pageRequest);
@@ -93,7 +89,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Page of Books searched by title")
+    @DisplayName("(3) Should return a Page of Books searched by title")
     void whenFindByTitleIgnoreCaseIsCalledThenReturnAPageOfBooks() {
         when(bookRepository.findByTitleContainingIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
@@ -105,7 +101,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty Page of Books when a language is entered")
+    @DisplayName("(4) Should return an empty Page of Books when a language is entered")
     void whenFindByTitleIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
         when(bookRepository.findByLanguageContainingIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findByLanguageContainingIgnoreCase("searchedText", pageRequest);
@@ -113,7 +109,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Page of Books searched by language")
+    @DisplayName("(5) Should return a Page of Books searched by language")
     void whenFindByLanguageIgnoreCaseIsCalledThenReturnAPageOfBooks() {
         when(bookRepository.findByLanguageContainingIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
@@ -125,7 +121,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty Page of Books when a language is entered")
+    @DisplayName("(6) Should return an empty Page of Books when a language is entered")
     void whenFindByLanguageIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
         when(bookRepository.findByLanguageContainingIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findByLanguageContainingIgnoreCase("searchedText", pageRequest);
@@ -133,7 +129,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Page of Books searched by publisher")
+    @DisplayName("(7) Should return a Page of Books searched by publisher")
     void whenFindByPublisherIgnoreCaseIsCalledThenReturnAPageOfBooks() {
         when(bookRepository.findByPublisherContainingIgnoreCase("searchedText", pageRequest))
                 .thenReturn(page);
@@ -145,7 +141,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty Page of Books when a publisher is entered")
+    @DisplayName("(8) Should return an empty Page of Books when a publisher is entered")
     void whenFindByPublisherIgnoreCaseIsCalledThenReturnAnEmptyPageOfBooks() {
         when(bookRepository.findByPublisherContainingIgnoreCase("searchedText", pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findByPublisherContainingIgnoreCase("searchedText", pageRequest);
@@ -153,7 +149,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a Page of Books searched by author name")
+    @DisplayName("(9) Should return a Page of Books searched by author name")
     void whenFindBooksByAuthorNameIsCalledThenReturnAPageOfBooks() {
         when(bookRepository.findBooksByAuthorName("searchedText", pageRequest))
                 .thenReturn(page);
@@ -165,7 +161,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty Page of Books when an author name is entered")
+    @DisplayName("(10) Should return an empty Page of Books when an author name is entered")
     void whenFindBooksByAuthorNameIsCalledThenReturnAnEmptyPageOfBooks() {
         when(bookRepository.findBooksByAuthorName("searchedText", pageRequest)).thenReturn(Page.empty());
         pageDTO = bookService.findBooksByAuthorName("searchedText", pageRequest);
@@ -173,7 +169,7 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should save a new Book")
+    @DisplayName("(11) Should save a new Book")
     void whenANewBookIsGivenThenItShouldBeSaved() {
         when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.empty());
         when(bookRepository.save(book)).thenReturn(book);
@@ -191,17 +187,17 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw a BookAlreadyRegisteredException exception")
+    @DisplayName("(12) Should throw a ExistingResourceException exception")
     void whenISBNAlreadyRegisteredIsGivenToSaveANewBookThenThrowAnException() {
         when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.of(book));
         book.setId(1L);
-        assertThrows(BookAlreadyRegisteredException.class, () -> bookService.save(bookDTO));
+        assertThrows(ExistingResourceException.class, () -> bookService.save(bookDTO));
     }
 
     @Test
-    @DisplayName("Should updateById data book by its id")
-    void whenARegisteredIdIsGivenToUpdateByIdDataBookThenItShouldBeUpdateByIdd() {
-        when(bookRepository.getById(book.getId())).thenReturn(book);
+    @DisplayName("(13) Should update the book by its id")
+    void whenAValidIdIsGivenToUpdateABookThenItShouldBeUpdated() {
+        when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
         bookDTO = bookService.updateById(bookDTO.getId(), bookDTO);
         assertThat(bookDTO.getId(), is(equalTo(book.getId())));
@@ -217,28 +213,26 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw a BookNotFoundException exception when an unregistered id is supplied")
-    void whenAnUnregisteredIdIsGivenToUpdateByIdBookDataThenThrowAnException() {
-        when(bookRepository.getById(book.getId())).thenReturn(null);
-        bookService.deleteById(bookDTO.getId());
-        assertThrows(BookNotFoundException.class, () -> bookResource.updateById(bookDTO.getId(), bookDTO));
+    @DisplayName("(14) Should throw a ResourceNotFoundException exception when an invalid id is supplied")
+    void whenAnInvalidIdIsGivenToUpdateByIdBookDataThenThrowAnException() {
+        when(bookRepository.findById(book.getId())).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> bookService.updateById(bookDTO.getId(), bookDTO));
     }
 
     @Test
-    @DisplayName("Should delete a book when a registered id is supplied")
+    @DisplayName("(15) Should delete a book when a registered id is supplied")
     void whenARegisteredBookIdIsGivenThenABookShouldBeDeleted() {
-        when(bookRepository.getById(book.getId())).thenReturn(book);
+        when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
         doNothing().when(bookRepository).deleteById(book.getId());
         bookService.deleteById(bookDTO.getId());
-        verify(bookRepository, times(1)).getById(book.getId());
+        verify(bookRepository, times(1)).findById(book.getId());
         verify(bookRepository, times(1)).deleteById(book.getId());
     }
 
     @Test
-    @DisplayName("Should throw a BookNotFoundException exception when trying to delete a Book with an unregistered id")
-    void whenAnUnregisteredBookIdIsGivenToDeleteABookThenThrowAnException() {
-        when(bookRepository.getById(book.getId())).thenReturn(null);
-        bookService.deleteById(bookDTO.getId());
-        assertThrows(BookNotFoundException.class, () -> bookResource.deleteById(bookDTO.getId()));
+    @DisplayName("(16) Should throw a ResourceNotFoundException exception when trying to delete a Book with an unregistered id")
+    void whenAnInvalidBookIdIsGivenToDeleteABookThenThrowAnException() {
+        when(bookRepository.findById(book.getId())).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> bookService.deleteById(bookDTO.getId()));
     }
 }

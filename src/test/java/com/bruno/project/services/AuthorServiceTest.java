@@ -3,9 +3,8 @@ package com.bruno.project.services;
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.repositories.AuthorRepository;
-import com.bruno.project.resources.AuthorResource;
-import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.AuthorNotFoundException;
+import com.bruno.project.services.exceptions.ExistingResourceException;
+import com.bruno.project.services.exceptions.ResourceNotFoundException;
 import com.bruno.project.services.impl.AuthorServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +30,7 @@ import static org.mockito.Mockito.*;
 public class AuthorServiceTest {
 
     private Author author = Author.builder()
+            .id(1L)
             .name("Jo Nesbø")
             .birthDate(LocalDate.parse("1960-03-29"))
             .email("jonesbo@jonesbo.com")
@@ -52,11 +52,8 @@ public class AuthorServiceTest {
     @InjectMocks
     private AuthorServiceImpl authorService;
 
-    @InjectMocks
-    private AuthorResource authorResource;
-
     @Test
-    @DisplayName("Should return a page of authors")
+    @DisplayName("(1) Should return a page of authors")
     void whenFindAllIsCalledThenReturnAPageWithAllAuthors() {
         when(authorRepository.findAll(pageRequest)).thenReturn(page);
         pageDTO = authorService.findAll(pageRequest);
@@ -68,7 +65,7 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty page of authors")
+    @DisplayName("(2) Should return an empty page of authors")
     void whenFindAllIsCalledThenReturnAnEmptyPage() {
         when(authorRepository.findAll(pageRequest)).thenReturn(Page.empty());
         pageDTO = authorService.findAll(pageRequest);
@@ -76,7 +73,7 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should return a page of authors searched by name")
+    @DisplayName("(3) Should return a page of authors searched by name")
     void whenFindByNameIgnoreCaseIsCalledThenReturnAPageOfAuthors() {
         when(authorRepository.findByNameContainingIgnoreCase("name", pageRequest)).thenReturn(page);
         pageDTO = authorService.findByNameContainingIgnoreCase("name", pageRequest);
@@ -88,7 +85,7 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should return an empty page of authors")
+    @DisplayName("(4) Should return an empty page of authors")
     void whenFindByNameIgnoreCaseIsCalledThenReturnAnEmptyPage() {
         when(authorRepository.findByNameContainingIgnoreCase("name", pageRequest)).thenReturn(Page.empty());
         pageDTO = authorService.findByNameContainingIgnoreCase("name", pageRequest);
@@ -96,9 +93,10 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should create a new author")
+    @DisplayName("(5) Should create a new author")
     void whenSaveMethodIsCalledThenShouldCreateANewAuthor() {
-        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.empty());
+        when(authorRepository.findByEmailIgnoreCase(authorDTO.getEmail())).thenReturn(Optional.empty());
+        author.setId(null);
         when(authorRepository.save(author)).thenReturn(author);
         authorDTO = authorService.save(authorDTO);
         assertThat(authorDTO.getId(), is(equalTo(author.getId())));
@@ -111,19 +109,19 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw an AuthorEmailAlreadyRegisteredException exception " +
+    @DisplayName("(6) Should throw an ExistingResourceException exception " +
             "when trying to create an author with a registered email")
     void whenSaveMethodIsCalledWithARegisteredEmailThenThrowException() {
         when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.of(author));
         author.setId(1L);
-        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.save(authorDTO));
+        assertThrows(ExistingResourceException.class, () -> authorService.save(authorDTO));
     }
 
     @Test
-    @DisplayName("Should updateById author data by its id")
+    @DisplayName("(7) Should update an author by its id")
     void whenUpdateByIdMethodIsCalledThenReturnAnUpdatedAuthor() {
         when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.empty());
-        when(authorRepository.getById(author.getId())).thenReturn(author);
+        when(authorRepository.findById(author.getId())).thenReturn(Optional.of(author));
         when(authorRepository.save(author)).thenReturn(author);
         authorDTO = authorService.updateById(authorDTO.getId(), authorDTO);
         assertThat(authorDTO.getId(), is(equalTo(author.getId())));
@@ -136,30 +134,28 @@ public class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw an AuthorEmailAlreadyRegisteredException exception " +
-            "when trying to updateById an author with a new already registered email")
+    @DisplayName("(8) Should throw an AuthorEmailAlreadyRegisteredException exception " +
+            "when trying to update an author by its id with a new email but already registered")
     void whenUpdateByIdMethodIsCalledWithANewRegisteredEmailThenThrowException() {
-        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.of(author));
-        author.setId(1L);
-        assertThrows(AuthorEmailAlreadyRegisteredException.class, () -> authorService.updateById(authorDTO.getId(), authorDTO));
+        when(authorRepository.findById(author.getId())).thenReturn(Optional.of(author));
+        when(authorRepository.findByEmailIgnoreCase(author.getEmail())).thenReturn(Optional.of(Author.builder().build()));
+        assertThrows(ExistingResourceException.class, () -> authorService.updateById(author.getId(), authorDTO));
     }
 
     @Test
-    @DisplayName("Should delete an author by its id")
+    @DisplayName("(9) Should delete an author by its id")
     void whenDeleteByIdMethodIsCalledWithARegisteredIdThenDeleteAnAuthor() {
-        when(authorRepository.getById(author.getId())).thenReturn(author);
+        when(authorRepository.findById(author.getId())).thenReturn(Optional.of(author));
         doNothing().when(authorRepository).deleteById(author.getId());
         authorService.deleteById(authorDTO.getId());
-        verify(authorRepository, times(1)).getById(author.getId());
+        verify(authorRepository, times(1)).findById(author.getId());
         verify(authorRepository, times(1)).deleteById(author.getId());
     }
 
     @Test
-    @DisplayName("Should throw an AuthorNotFoundException exception when an unregistered id is supplied " +
+    @DisplayName("(10) Should throw an ResourceNotFoundException exception when an unregistered id is supplied " +
             "to delete an author")
-    void whenAnUnregisteredIdIsGivenToDeleteAnAuthorThenThrowException() {
-        when(authorRepository.getById(author.getId())).thenReturn(null);
-        authorService.deleteById(authorDTO.getId());
-        assertThrows(AuthorNotFoundException.class, () -> authorResource.deleteById(authorDTO.getId()));
+    void whenAnInvalidIdIsGivenToDeleteAnAuthorThenThrowException() {
+        assertThrows(ResourceNotFoundException.class, () -> authorService.deleteById(authorDTO.getId()));
     }
 }

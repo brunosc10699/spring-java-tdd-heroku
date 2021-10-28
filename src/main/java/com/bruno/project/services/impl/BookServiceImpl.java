@@ -7,8 +7,8 @@ import com.bruno.project.entities.Book;
 import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.services.BookService;
-import com.bruno.project.services.exceptions.AuthorNotFoundException;
-import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
+import com.bruno.project.services.exceptions.ExistingResourceException;
+import com.bruno.project.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +59,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDTO save(BookDTO bookDTO){
-        checkRegisteredISBN(bookDTO.getId(), bookDTO.getIsbn());
+        checkRegisteredISBN(null, bookDTO.getIsbn());
         bookDTO.setId(null);
         if(bookDTO.getUrlCover() == null) bookDTO.setUrlCover("51264896706_e66beed079_n.jpg");
         List<Author> listAuthor = checkRegisteredAuthors(bookDTO.getAuthors());
@@ -107,22 +107,22 @@ public class BookServiceImpl implements BookService {
         List<Author> listAuthor = new ArrayList<>();
         for(AuthorDTO authorDTO : list){
             Author author = authorRepository.findById(authorDTO.getId())
-                    .orElseThrow(() -> new AuthorNotFoundException(authorDTO.getId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Author not found with this ID: '" + authorDTO.getId()));
             listAuthor.add(author);
         }
         return listAuthor;
     }
 
     private Book checkGivenId(Long id){
-        Book book = bookRepository.getById(id);
-        return book;
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("The id '" + id + "' was not found!"));
     }
 
     @Transactional(readOnly = true)
     private Optional<Book> checkRegisteredISBN(Long id, String isbn){
         Optional<Book> book = bookRepository.findByIsbn(isbn);
         if(book.isPresent() && book.get().getId() != id)
-            throw new BookAlreadyRegisteredException(isbn);
+            throw new ExistingResourceException("The ISBN '" + isbn + "' is already registered!");
         return book;
     }
 }

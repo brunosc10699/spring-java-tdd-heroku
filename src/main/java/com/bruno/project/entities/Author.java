@@ -30,7 +30,7 @@ public class Author implements Serializable {
     private LocalDate birthDate;
 
     @EqualsAndHashCode.Exclude
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @EqualsAndHashCode.Exclude

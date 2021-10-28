@@ -1,15 +1,11 @@
 package com.bruno.project.resources;
 
 import com.bruno.project.dto.AuthorDTO;
-import com.bruno.project.services.AuthorService;
-import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import com.bruno.project.services.impl.AuthorServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -44,11 +40,7 @@ public class AuthorResource {
     @ApiResponses(value = @ApiResponse(code = 400, message = "Author email already registered"))
     @PostMapping
     public ResponseEntity<AuthorDTO> save(@Valid @RequestBody AuthorDTO authorDTO){
-        try {
-            authorDTO = authorService.save(authorDTO);
-        } catch (Exception e) {
-            throw new AuthorEmailAlreadyRegisteredException(e.getMessage());
-        }
+        authorDTO = authorService.save(authorDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(authorDTO)
@@ -63,16 +55,7 @@ public class AuthorResource {
     })
     @PutMapping(value = "/{id}")
     public ResponseEntity<AuthorDTO> updateById(@PathVariable Long id, @Valid @RequestBody AuthorDTO authorDTO){
-        try {
-            authorDTO = authorService.updateById(id, authorDTO);
-        } catch (AuthorEmailAlreadyRegisteredException e) {
-            throw new AuthorEmailAlreadyRegisteredException(e.getMessage());
-        } catch (AuthorNotFoundException e) {
-            throw new AuthorNotFoundException(e.getMessage());
-        } catch (Exception e) {
-            throw new AuthorNotFoundException(e.getMessage());
-        }
-        return ResponseEntity.ok(authorDTO);
+        return ResponseEntity.ok(authorService.updateById(id, authorDTO));
     }
 
     @ApiOperation(value = "Exclude an author")
@@ -82,11 +65,7 @@ public class AuthorResource {
     })
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
-        try {
-            authorService.deleteById(id);
-        } catch (Exception e) {
-            throw new AuthorNotFoundException(e.getMessage());
-        }
+        authorService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

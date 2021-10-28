@@ -2,8 +2,8 @@ package com.bruno.project.resources;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
-import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
-import com.bruno.project.services.exceptions.AuthorNotFoundException;
+import com.bruno.project.services.exceptions.ExistingResourceException;
+import com.bruno.project.services.exceptions.ResourceNotFoundException;
 import com.bruno.project.services.impl.AuthorServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -104,7 +104,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("(4) Must throw 400 BadRequest status when a registered email is provided")
     void whenPOSTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
-        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).save(givenAuthor);
+        doThrow(ExistingResourceException.class).when(authorService).save(givenAuthor);
         mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
@@ -129,7 +129,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("(6) Must throw 400 BadRequest status when trying to updateById author data with an already registered email")
     void whenPUTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
-        doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
+        doThrow(ExistingResourceException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
         mockMvc.perform(MockMvcRequestBuilders.put(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
@@ -139,7 +139,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("(7) Must throw 404 NotFound status when trying to updateById author data with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
-        doThrow(AuthorNotFoundException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
+        doThrow(ResourceNotFoundException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
         mockMvc.perform(MockMvcRequestBuilders.put(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
@@ -158,7 +158,7 @@ public class AuthorResourceTest {
     @Test
     @DisplayName("(9) Must return 404 NotFound status when author id is not registered")
     void whenDELETEIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
-        doThrow(AuthorNotFoundException.class).when(authorService).deleteById(givenAuthor.getId());
+        doThrow(ResourceNotFoundException.class).when(authorService).deleteById(givenAuthor.getId());
         mockMvc.perform(MockMvcRequestBuilders.delete(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
