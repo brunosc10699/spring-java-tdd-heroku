@@ -1,6 +1,5 @@
 package com.bruno.project.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -47,7 +46,6 @@ public class Author implements Serializable {
 
     @Builder.Default
     @EqualsAndHashCode.Exclude
-    @JsonIgnore
-    @ManyToMany(mappedBy = "authors", cascade = CascadeType.ALL)
-    private List<Book> books = new ArrayList<>();
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<Book> books = new ArrayList<>();
 }

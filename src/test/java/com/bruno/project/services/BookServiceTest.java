@@ -8,6 +8,7 @@ import com.bruno.project.repositories.BookRepository;
 import com.bruno.project.resources.BookResource;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
+import com.bruno.project.services.impl.BookServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +56,7 @@ public class BookServiceTest {
             .bookGenre(BookGenre.toEnum(6))
             .build();
 
-    private BookDTO bookDTO = new BookDTO(book);
+    private BookDTO bookDTO = BookDTO.toDTO(book);
 
     private Page<Book> page = new PageImpl<Book>(Collections.singletonList(book));
 
@@ -67,7 +68,7 @@ public class BookServiceTest {
     private BookRepository bookRepository;
 
     @InjectMocks
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
     @InjectMocks
     private BookResource bookResource;

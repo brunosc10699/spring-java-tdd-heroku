@@ -2,7 +2,6 @@ package com.bruno.project.resources;
 
 import com.bruno.project.dto.AuthorDTO;
 import com.bruno.project.entities.Author;
-import com.bruno.project.services.AuthorService;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
 import com.bruno.project.services.impl.AuthorServiceImpl;
@@ -35,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthorResourceTest {
 
     private Author expectedAuthor = Author.builder()
+            .id(1L)
             .name("Jo Nesbø")
             .birthDate(LocalDate.parse("1960-03-29"))
             .email("jonesbo@jonesbo.com")
@@ -42,7 +42,7 @@ public class AuthorResourceTest {
             .urlPicture("0284334234.jpg")
             .build();
 
-    private AuthorDTO givenAuthor = new AuthorDTO(expectedAuthor);
+    private AuthorDTO givenAuthor = AuthorDTO.toDTO(expectedAuthor);
 
     private AuthorDTO authorDTO;
 
@@ -50,7 +50,7 @@ public class AuthorResourceTest {
 
     private PageRequest pageRequest = PageRequest.of(0, 20);
 
-    private static final String URL = "/api/v1/authors";
+    private static final String URN = "/api/v1/authors/";
 
     private MockMvc mockMvc;
 
@@ -69,28 +69,28 @@ public class AuthorResourceTest {
     }
 
     @Test
-    @DisplayName("Must return 200 Ok status when searching for all authors")
+    @DisplayName("(1) Must return 200 Ok status when searching for all authors")
     void whenGETIsCalledToFindAllAuthorsThenReturnOkStatus() throws Exception {
         when(authorService.findAll(pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL)
+        mockMvc.perform(MockMvcRequestBuilders.get(URN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Must return 200 Ok status when searching for authors by name")
+    @DisplayName("(2) Must return 200 Ok status when searching for authors by name")
     void whenGETIsCalledToFindAuthorsByNameThenReturnOkStatus() throws Exception {
         when(authorService.findByNameContainingIgnoreCase(givenAuthor.getName(), pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/name?text=" + givenAuthor.getName())
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "name?text=" + givenAuthor.getName())
         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Must return 201 Created status")
+    @DisplayName("(3) Must return 201 Created status")
     void whenPOSTIsCalledThenReturnOkStatus() throws Exception {
         when(authorService.save(givenAuthor)).thenReturn(givenAuthor);
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(URN)
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(givenAuthor)))
                 .andExpect(status().isCreated())
@@ -102,20 +102,20 @@ public class AuthorResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw 400 BadRequest status when a registered email is provided")
+    @DisplayName("(4) Must throw 400 BadRequest status when a registered email is provided")
     void whenPOSTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
         doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).save(givenAuthor);
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Must return 200 Ok status when updating author data")
+    @DisplayName("(5) Must return 200 Ok status when updating author data")
     void whenPUTIsCalledThenReturnOkStatus() throws Exception {
         when(authorService.updateById(givenAuthor.getId(), givenAuthor)).thenReturn(givenAuthor);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + givenAuthor.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + givenAuthor.getId())
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(givenAuthor)))
                 .andExpect(status().isOk())
@@ -127,39 +127,39 @@ public class AuthorResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw 400 BadRequest status when trying to updateById author data with an already registered email")
+    @DisplayName("(6) Must throw 400 BadRequest status when trying to updateById author data with an already registered email")
     void whenPUTIsCalledWithARegisteredEmailThenReturnBadRequestStatus() throws Exception {
         doThrow(AuthorEmailAlreadyRegisteredException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + givenAuthor.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Must throw 404 NotFound status when trying to updateById author data with an unregistered id")
+    @DisplayName("(7) Must throw 404 NotFound status when trying to updateById author data with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         doThrow(AuthorNotFoundException.class).when(authorService).updateById(givenAuthor.getId(), givenAuthor);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + givenAuthor.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(givenAuthor)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("Must return 204 NoContent status when trying to delete an author")
+    @DisplayName("(8) Must return 204 NoContent status when trying to delete an author")
     void whenDELETEIsCalledThenReturnNoContentStatus() throws Exception {
         doNothing().when(authorService).deleteById(givenAuthor.getId());
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + givenAuthor.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("Must return 404 NotFound status when author id is not registered")
+    @DisplayName("(9) Must return 404 NotFound status when author id is not registered")
     void whenDELETEIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         doThrow(AuthorNotFoundException.class).when(authorService).deleteById(givenAuthor.getId());
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + givenAuthor.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + givenAuthor.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

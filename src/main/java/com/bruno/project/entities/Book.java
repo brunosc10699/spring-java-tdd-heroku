@@ -56,15 +56,11 @@ public class Book implements Serializable {
     @EqualsAndHashCode.Exclude
     private BookGenre bookGenre;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "tb_book_author",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
-
-    @Builder.Default
-    @EqualsAndHashCode.Exclude
-    @Column(nullable = false)
-    private List<Author> authors = new ArrayList<>();
+    final List<Author> authors = new ArrayList<>();
 
 }

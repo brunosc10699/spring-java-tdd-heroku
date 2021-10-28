@@ -6,6 +6,7 @@ import com.bruno.project.repositories.AuthorRepository;
 import com.bruno.project.resources.AuthorResource;
 import com.bruno.project.services.exceptions.AuthorEmailAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.AuthorNotFoundException;
+import com.bruno.project.services.impl.AuthorServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,17 +30,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class AuthorServiceTest {
 
-    private Author author = new Author(
-            null,
-            "Jo Nesbø",
-            LocalDate.parse("1960-03-29"),
-            "jonesbo@jonesbo.com",
-            null,
-            "Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).",
-            "51265117593_c76eb4ccb8_n.jpg"
-    );
+    private Author author = Author.builder()
+            .name("Jo Nesbø")
+            .birthDate(LocalDate.parse("1960-03-29"))
+            .email("jonesbo@jonesbo.com")
+            .biography("Jo Nesbø (Norwegian: born 29 March 1960) is a Norwegian writer, musician, economist, and former soccer player and reporter. More than 3 million copies of his novels had been sold in Norway as of March 2014; his work has been translated into over 50 languages, and by 2021 had sold some 50 million copies worldwide. Known primarily for his crime novels featuring Inspector Harry Hole, Nesbø is also the main vocalist and songwriter for the Norwegian rock band Di Derre. In 2007 he released his first children's book, Doktor Proktors Prompepulver (English translation: Doctor Proctor's Fart Powder). The 2011 film Headhunters is based on Nesbø's novel Hodejegerne (The Headhunters).")
+            .urlPicture("0284334234.jpg")
+            .build();
 
-    private AuthorDTO authorDTO = new AuthorDTO(author);
+    private AuthorDTO authorDTO = AuthorDTO.toDTO(author);
 
     private Page<Author> page = new PageImpl<Author>(Collections.singletonList(author));
 
@@ -51,7 +50,7 @@ public class AuthorServiceTest {
     private AuthorRepository authorRepository;
 
     @InjectMocks
-    private AuthorService authorService;
+    private AuthorServiceImpl authorService;
 
     @InjectMocks
     private AuthorResource authorResource;
@@ -134,7 +133,6 @@ public class AuthorServiceTest {
         assertThat(authorDTO.getPhone(), is(equalTo(author.getPhone())));
         assertThat(authorDTO.getBiography(), is(equalTo(author.getBiography())));
         assertThat(authorDTO.getUrlPicture(), is(equalTo(author.getUrlPicture())));
-        assertThat(authorDTO.getBooks(), is(equalTo(author.getBooks())));
     }
 
     @Test

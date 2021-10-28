@@ -5,7 +5,6 @@ import com.bruno.project.dto.BookDTO;
 import com.bruno.project.entities.Author;
 import com.bruno.project.entities.Book;
 import com.bruno.project.enums.BookGenre;
-import com.bruno.project.services.BookService;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
 import com.bruno.project.services.impl.BookServiceImpl;
@@ -38,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BookResourceTest {
 
     private Author author = Author.builder()
+            .id(1L)
             .name("Jo Nesbø")
             .birthDate(LocalDate.parse("1960-03-29"))
             .email("jonesbo@jonesbo.com")
@@ -45,9 +45,10 @@ public class BookResourceTest {
             .urlPicture("0284334234.jpg")
             .build();
 
-    private AuthorDTO authorDTO = new AuthorDTO(author);
+    private AuthorDTO authorDTO = AuthorDTO.toDTO(author);
 
     private Book givenBook = Book.builder()
+            .id(1L)
             .isbn("978-0099520320")
             .title("The Bat")
             .printLength(432)
@@ -58,9 +59,9 @@ public class BookResourceTest {
             .bookGenre(BookGenre.toEnum(6))
             .build();
 
-    private BookDTO expectedBook = new BookDTO(givenBook);
+    private BookDTO expectedBook = BookDTO.toDTO(givenBook);
 
-    private static final String URL = "/api/v1/books";
+    private static final String URN = "/api/v1/books/";
 
     private PageRequest pageRequest = PageRequest.of(0, 20);
 
@@ -83,57 +84,56 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status when searching all books")
+    @DisplayName("(1) Should return 200 Ok status when searching all books")
     void whenGETIsCalledToFindAllBooksThenReturnOkStatus() throws Exception {
         when(bookService.findAll(pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL)
+        mockMvc.perform(MockMvcRequestBuilders.get(URN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status when searching by title")
+    @DisplayName("(2) Should return 200 Ok status when searching by title")
     void whenGETIsCalledToFindBooksByTitleThenReturnOkStatus() throws Exception {
         when(bookService.findByTitleContainingIgnoreCase(givenBook.getTitle(), pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/title?text=" + givenBook.getTitle())
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/title?text=" + givenBook.getTitle())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status when searching by language")
+    @DisplayName("(3) Should return 200 Ok status when searching by language")
     void whenGETIsCalledToFindBooksByLanguageThenReturnOkStatus() throws Exception {
         when(bookService.findByLanguageContainingIgnoreCase(givenBook.getLanguage(), pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/language?text=" + givenBook.getLanguage())
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/language?text=" + givenBook.getLanguage())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status when searching by publisher")
+    @DisplayName("(4) Should return 200 Ok status when searching by publisher")
     void whenGETIsCalledToFindBooksByPublisherThenReturnOkStatus() throws Exception {
         when(bookService.findByPublisherContainingIgnoreCase(givenBook.getPublisher(), pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/publisher?text=" + givenBook.getPublisher())
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/publisher?text=" + givenBook.getPublisher())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Should return 200 Ok status when searching by author name")
+    @DisplayName("(5) Should return 200 Ok status when searching by author name")
     void whenGETIsCalledToFindBooksByAuthorNameThenReturnOkStatus() throws Exception {
-        givenBook.getAuthors().add(author);
-        when(bookService.findBooksByAuthorName(givenBook.getAuthors().get(0).getName(), pageRequest)).thenReturn(page);
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/author?text=" + givenBook.getAuthors().get(0).getName())
+        when(bookService.findBooksByAuthorName(authorDTO.getName(), pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "author?text=" + authorDTO.getName())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("Should return 201 created status")
+    @DisplayName("(6) Should return 201 created status")
     void whenPOSTIsCalledThenReturnCreatedStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
         when(bookService.save(expectedBook)).thenReturn(expectedBook);
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(URN)
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(expectedBook)))
                 .andExpect(status().isCreated())
@@ -148,22 +148,21 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw a BookAlreadyRegisteredException exception when a registered ISBN is provided")
+    @DisplayName("(7) Must throw a BookAlreadyRegisteredException exception when a registered ISBN is provided")
     void whenPOSTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
         doThrow(BookAlreadyRegisteredException.class).when(bookService).save(expectedBook);
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Must return 200 Ok status when updating book data")
+    @DisplayName("(8) Must return 200 Ok status when updating book data")
     void whenPUTIsCalledToUpdateByIdBookDataThenReturnOkStatus() throws Exception {
-        expectedBook.getAuthors().add(authorDTO);
         when(bookService.updateById(expectedBook.getId(), expectedBook)).thenReturn(expectedBook);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + expectedBook.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isOk())
@@ -178,42 +177,42 @@ public class BookResourceTest {
     }
 
     @Test
-    @DisplayName("Must throw a BookNotFoundException exception when trying to updateById a book with an unregistered id")
+    @DisplayName("(9) Must throw a BookNotFoundException exception when trying to updateById a book with an unregistered id")
     void whenPUTIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
         when(bookService.updateById(expectedBook.getId(), expectedBook)).thenThrow(BookNotFoundException.class);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + expectedBook.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("Must throw a BookAlreadyRegisteredException exception " +
+    @DisplayName("(10) Must throw a BookAlreadyRegisteredException exception " +
             "when trying to updateById a book with a registered ISBN")
     void whenPUTIsCalledWithARegisteredISBNThenReturnBadRequestStatus() throws Exception {
         expectedBook.getAuthors().add(authorDTO);
         doThrow(BookAlreadyRegisteredException.class).when(bookService).updateById(expectedBook.getId(), expectedBook);
-        mockMvc.perform(MockMvcRequestBuilders.put(URL + "/" + expectedBook.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(expectedBook)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Must return 204 NoContent status when deleting a book")
+    @DisplayName("(11) Must return 204 NoContent status when deleting a book")
     void whenDELETEIsCalledThenReturnNoContentStatus() throws Exception {
         doNothing().when(bookService).deleteById(expectedBook.getId());
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + expectedBook.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("Must throw a BookNotFoundException exception when an unregistered id is provided")
+    @DisplayName("(12) Must throw a BookNotFoundException exception when an unregistered id is provided")
     void whenDELETEIsCalledWithAnUnregisteredIdThenReturnNotFoundStatus() throws Exception {
         doThrow(BookNotFoundException.class).when(bookService).deleteById(expectedBook.getId());
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/" + expectedBook.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + expectedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

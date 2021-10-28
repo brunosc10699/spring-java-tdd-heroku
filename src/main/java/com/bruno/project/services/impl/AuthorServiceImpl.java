@@ -24,12 +24,13 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional(readOnly = true)
     @Override
     public Page<AuthorDTO> findAll(Pageable pageable){
-        return authorRepository.findAll(pageable).map(AuthorDTO::new);
+        return authorRepository.findAll(pageable).map(AuthorDTO::toDTO);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<AuthorDTO> findByNameContainingIgnoreCase(String name, Pageable pageable) {
-        return authorRepository.findByNameContainingIgnoreCase(name, pageable).map(AuthorDTO::new);
+        return authorRepository.findByNameContainingIgnoreCase(name, pageable).map(AuthorDTO::toDTO);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class AuthorServiceImpl implements AuthorService {
         authorDTO.setId(null);
         if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
         Author author = fromDTO(authorDTO);
-        return new AuthorDTO(authorRepository.save(author));
+        return AuthorDTO.toDTO(authorRepository.save(author));
     }
 
     @Override
@@ -52,7 +53,7 @@ public class AuthorServiceImpl implements AuthorService {
         if(authorDTO.getUrlPicture() == null) authorDTO.setUrlPicture("51265117593_c76eb4ccb8_n.jpg");
         authorDTO.setId(id);
         Author author = fromDTO(authorDTO);
-        return new AuthorDTO(authorRepository.save(author));
+        return AuthorDTO.toDTO(authorRepository.save(author));
     }
 
     @Override
@@ -78,6 +79,7 @@ public class AuthorServiceImpl implements AuthorService {
         return author;
     }
 
+    @Transactional(readOnly = true)
     private Optional<Author> checkRegisteredEmail(Long id, String email){
         Optional<Author> author = authorRepository.findByEmailIgnoreCase(email);
         if(author.isPresent() && author.get().getId() != id)

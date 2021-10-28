@@ -30,27 +30,31 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable).map(BookDTO::new);
+        return bookRepository.findAll(pageable).map(BookDTO::toDTO);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findByTitleContainingIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByTitleContainingIgnoreCase(text, pageable).map(BookDTO::new);
+        return bookRepository.findByTitleContainingIgnoreCase(text, pageable).map(BookDTO::toDTO);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findByLanguageContainingIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByLanguageContainingIgnoreCase(text, pageable).map(BookDTO::new);
+        return bookRepository.findByLanguageContainingIgnoreCase(text, pageable).map(BookDTO::toDTO);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findByPublisherContainingIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByPublisherContainingIgnoreCase(text, pageable).map(BookDTO::new);
+        return bookRepository.findByPublisherContainingIgnoreCase(text, pageable).map(BookDTO::toDTO);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findBooksByAuthorName(String author, Pageable pageable){
-        return bookRepository.findBooksByAuthorName(author, pageable).map(BookDTO::new);
+        return bookRepository.findBooksByAuthorName(author, pageable).map(BookDTO::toDTO);
     }
 
     @Override
@@ -62,7 +66,7 @@ public class BookServiceImpl implements BookService {
         bookDTO.getAuthors().clear();
         Book book = fromDTO(bookDTO);
         book.getAuthors().addAll(listAuthor);
-        return new BookDTO(bookRepository.save(book));
+        return BookDTO.toDTO(bookRepository.save(book));
     }
 
     @Override
@@ -74,7 +78,7 @@ public class BookServiceImpl implements BookService {
         bookDTO.setId(id);
         Book book = fromDTO(bookDTO);
         book.getAuthors().addAll(listAuthor);
-        return new BookDTO(bookRepository.save(book));
+        return BookDTO.toDTO(bookRepository.save(book));
     }
 
     @Override
@@ -98,6 +102,7 @@ public class BookServiceImpl implements BookService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     private List<Author> checkRegisteredAuthors(List<AuthorDTO> list) {
         List<Author> listAuthor = new ArrayList<>();
         for(AuthorDTO authorDTO : list){
@@ -113,6 +118,7 @@ public class BookServiceImpl implements BookService {
         return book;
     }
 
+    @Transactional(readOnly = true)
     private Optional<Book> checkRegisteredISBN(Long id, String isbn){
         Optional<Book> book = bookRepository.findByIsbn(isbn);
         if(book.isPresent() && book.get().getId() != id)

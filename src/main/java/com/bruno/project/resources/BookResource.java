@@ -1,7 +1,6 @@
 package com.bruno.project.resources;
 
 import com.bruno.project.dto.BookDTO;
-import com.bruno.project.services.BookService;
 import com.bruno.project.services.exceptions.BookAlreadyRegisteredException;
 import com.bruno.project.services.exceptions.BookNotFoundException;
 import com.bruno.project.services.impl.BookServiceImpl;
@@ -9,7 +8,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
