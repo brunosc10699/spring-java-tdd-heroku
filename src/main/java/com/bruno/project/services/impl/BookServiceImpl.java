@@ -30,31 +30,36 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable).map(BookDTO::toDTO);
+        Page<Book> page = bookRepository.findAll(pageable);
+        return getPage(page);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findByTitleContainingIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByTitleContainingIgnoreCase(text, pageable).map(BookDTO::toDTO);
+        Page<Book> page = bookRepository.findByTitleContainingIgnoreCase(text, pageable);
+        return getPage(page);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findByLanguageContainingIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByLanguageContainingIgnoreCase(text, pageable).map(BookDTO::toDTO);
+        Page<Book> page = bookRepository.findByLanguageContainingIgnoreCase(text, pageable);
+        return getPage(page);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findByPublisherContainingIgnoreCase(String text, Pageable pageable){
-        return bookRepository.findByPublisherContainingIgnoreCase(text, pageable).map(BookDTO::toDTO);
+        Page<Book> page = bookRepository.findByPublisherContainingIgnoreCase(text, pageable);
+        return getPage(page);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<BookDTO> findBooksByAuthorName(String author, Pageable pageable){
-        return bookRepository.findBooksByAuthorName(author, pageable).map(BookDTO::toDTO);
+        Page<Book> page = bookRepository.findBooksByAuthorName(author, pageable);
+        return getPage(page);
     }
 
     @Override
@@ -85,6 +90,11 @@ public class BookServiceImpl implements BookService {
     public void deleteById(Long id){
         checkGivenId(id);
         bookRepository.deleteById(id);
+    }
+
+    private Page<BookDTO> getPage(Page<Book> page) {
+        bookRepository.findBooksAuthors(page.toList());
+        return page.map(BookDTO::toDTO);
     }
 
     private Book fromDTO(BookDTO bookDTO) {

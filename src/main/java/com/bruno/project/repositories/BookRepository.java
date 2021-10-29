@@ -8,10 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
+
+    @Query("SELECT obj FROM Book obj JOIN FETCH obj.authors WHERE obj IN :books")
+    List<Book> findBooksAuthors(List<Book> books);
 
     Page<Book> findByTitleContainingIgnoreCase(String text, Pageable pageable);
 

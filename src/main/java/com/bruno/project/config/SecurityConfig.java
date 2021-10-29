@@ -1,10 +1,10 @@
 package com.bruno.project.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,10 +21,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final Environment environment;
 
-    private static final String[] PUBLIC_MATCHERS = {
-            "/h2-console/**",
+    private static final String[] PUBLIC_MATCHERS_GET = {
             "/api/v1/authors/**",
-            "/api/v1/books/**"
+            "/api/v1/books/**",
+            "/actuator/health"
     };
 
     @Override
@@ -37,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             http.authorizeRequests().anyRequest().permitAll();
         } else {
             http.authorizeRequests()
+                    .antMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET)
+                    .permitAll()
                     .anyRequest()
                     .authenticated();
         }
